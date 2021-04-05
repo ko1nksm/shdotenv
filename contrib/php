@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+docker build -t "dotenv:${0##*/}" - <<HERE
+FROM php
+RUN apt-get update && apt-get install -y vim zip unzip
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+WORKDIR /root
+RUN composer require vlucas/phpdotenv
+HERE
+
+cid=$(docker create --rm -it "dotenv:${0##*/}" /bin/bash)
+docker cp ./ "$cid:/root/"
+docker start -ai "$cid"

@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+require_once 'vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(getcwd());
+$dotenv->load();
+print_r($_ENV);

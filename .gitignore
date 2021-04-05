@@ -1,0 +1,6 @@
+/.shellspec-local
+/.shellspec-quick.log
+/report/
+/coverage/
+/shdotenv
+/shdotenv.tar.gz

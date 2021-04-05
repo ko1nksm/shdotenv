@@ -1,0 +1,96 @@
+#!/bin/sh
+
+# MIT License
+#
+# Copyright (c) 2021 Koichi Nakashima
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+set -eu
+
+version() { echo 0.1.0; }
+
+usage() {
+	printf '%s\n' "Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]" "" \
+		"  -e, --env         Location of the .env file. [default: .env]" \
+		"                    Multiple -e options are allowed." \
+		"      --overload    Overloads predefined environment variables." \
+		"      --allexport   Add the exprot prefix to all environment variables." \
+		"  -k, --keyonly     Output only environment variable names." \
+		"  -v, --version     Show the version and exit." \
+		"  -h, --help        Show this message and exit."
+}
+
+abort() { echo "$@" >&2 && exit 1; }
+
+parse_options() {
+	while [ $# -gt 0 ]; do
+		case $1 in
+			-e | --env)
+				[ $# -gt 1 ] || abort "Error: $1 option requires an argument"
+				shift
+				_shdotenv_pos=$((_shdotenv_pos + 1))
+				_shdotenv_envfiles="$_shdotenv_envfiles \"\${$_shdotenv_pos}\""
+				;;
+			--overload) _shdotenv_overload=1 ;;
+			--allexport) _shdotenv_allexport=1 ;;
+			-k | --keyonly) _shdotenv_keyonly=1 ;;
+			-v | --version) version && exit 0 ;;
+			-h | --help) usage && exit 0 ;;
+			--) _shdotenv_pos=$((_shdotenv_pos + 1)) && break ;;
+			-*) abort "Unknown option: $1" ;;
+			*) break ;;
+		esac
+		shift
+		_shdotenv_pos=$((_shdotenv_pos + 1))
+	done
+}
+
+exec_awk() {
+	eval "set -- ${_shdotenv_envfiles:-.env}"
+	set -- "$_shdotenv_parser" "$@"
+	[ "$_shdotenv_overload" ] && set -- -v OVERLOAD="$_shdotenv_overload" "$@"
+	[ "$_shdotenv_allexport" ] && set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
+	[ "$_shdotenv_keyonly" ] && set -- -v KEYONLY="$_shdotenv_keyonly" "$@"
+	"${SHDOTENV_AWK:-awk}" "$@"
+}
+
+eval_env() {
+	eval "set --; $1"
+}
+
+_shdotenv_overload='' _shdotenv_allexport='' _shdotenv_keyonly=''
+_shdotenv_pos=1 _shdotenv_envfiles=''
+_shdotenv_parser=$(cat src/parser.awk) # @INCLUDE-FILE
+
+parse_options "$@"
+
+if [ $(($# - _shdotenv_pos + 1)) -gt 0 ]; then
+	_shdotenv_allexport=1
+	_shdotenv_env=$(exec_awk "$@")
+	shift $((_shdotenv_pos - 1))
+	set -- "$_shdotenv_env" "$@"
+	unset _shdotenv_overload _shdotenv_allexport _shdotenv_pos \
+		_shdotenv_envfiles _shdotenv_env _shdotenv_parser
+	eval_env "$1"
+	shift
+	exec "$@"
+else
+	exec_awk "$@"
+fi

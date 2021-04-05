@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -eu
+
+docker build -t "dotenv:${0##*/}" - <<HERE
+FROM python
+RUN apt-get update && apt-get install -y vim
+RUN pip install "python-dotenv[cli]"
+WORKDIR /root
+HERE
+
+cid=$(docker create --rm -it "dotenv:${0##*/}" /bin/bash)
+docker cp ./ "$cid:/root/"
+docker start -ai "$cid"

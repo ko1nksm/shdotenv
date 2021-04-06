@@ -11,7 +11,7 @@
 
 ## Requirements
 
-awk (gawk, nawk, mawk, busybox awk)
+awk (gawk, nawk, mawk)
 
 ## Install
 

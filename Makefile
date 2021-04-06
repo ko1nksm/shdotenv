@@ -1,9 +1,7 @@
 PREFIX ?= /usr/local
 BINDIR := $(PREFIX)/bin
 
-.PHONY: all build check test package clean install uninstall
-
-all: build package
+.PHONY: build check test package clean install uninstall
 
 build:
 	./src/build.sh < src/shdotenv > ./shdotenv
@@ -20,7 +18,7 @@ package:
 	tar czf shdotenv.tar.gz shdotenv
 
 clean:
-	rm shdotenv shdotenv.tar.gz
+	rm -f shdotenv shdotenv.tar.gz
 
 install:
 	install -m 755 shdotenv $(BINDIR)/shdotenv

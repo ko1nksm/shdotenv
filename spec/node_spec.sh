@@ -23,6 +23,7 @@ Describe "dotenv node parser"
       Parameters
         'VALUE="foo\abar"'        'VALUE="foo\abar"'
         'VALUE="foo\nbar"'        'VALUE="foo'"$LF"'bar"'
+        'FOO="$VAR"'              'FOO="${VAR}"'
       End
 
       It "parses value the \`$1'"

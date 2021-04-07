@@ -286,6 +286,7 @@ Describe "dotenv posix parser"
       Parameters
         'FOO="#value"# comment' "\`FOO=\"#value\"# comment': spaces are required before the end-of-line comment"
         'FOO="value'            "\`FOO=\"value': unterminated quoted string"
+        'FOO="$VAR"'            "\`FOO=\"\$VAR\"': the following metacharacters must be escaped: \$\`\"\\"
         'FOO="${VAR-$}"'        "\`FOO=\"\${VAR-\$}\"': the following characters cannot be used for parameter expansion values: !()*<>[]{|}\\\$"
         'FOO="val"ue"'          "\`FOO=\"val\"ue\"': the following metacharacters must be escaped: \$\`\"\\"
       End

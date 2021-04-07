@@ -24,6 +24,7 @@ Describe "dotenv ruby parser"
         'VALUE="foo\abar"'        'VALUE="fooabar"'
         'VALUE="foo\nbar"'        'VALUE="foo'"$LF"'bar"'
         'VALUE="foo\rbar"'        'VALUE="foo'"$CR"'bar"'
+        'FOO="$VAR"'              'FOO="${VAR}"'
       End
 
       It "parses value the \`$1'"

@@ -21,13 +21,23 @@ make
 make install PREFIX=$HOME
 ```
 
-### Recommended settings
-
-```sh
-alias dotenv="shdotenv -a"
-```
-
 ## How to use
+
+### Usage
+
+```
+Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]
+
+  -d, --dialect     Specify the .env dialect [default: posix]
+  -e, --env         Location of the .env file [default: .env]
+                    Multiple -e options are allowed
+      --overload    Overload predefined environment variables
+  -a, --allexport   Exprot all variables
+  -k, --keyonly     Output only variable names
+  -q, --quiet       Suppress all output
+  -v, --version     Show the version and exit
+  -h, --help        Show this message and exit
+```
 
 ### Use as library
 
@@ -39,6 +49,13 @@ eval "$(shdotenv [OPTION]...)"
 
 ```sh
 shdotenv [OPTION]... <COMMAND> [ARGUMENTS]...
+```
+
+For normal use cases, the `-a` (`--allexport`) option will be necessary. It is useful to define alias.
+
+```sh
+alias shdotenv="shdotenv -a"
+alias dotenv="shdotenv -a" # Use as an alternative to dotenv
 ```
 
 ## .env file syntax

@@ -11,7 +11,8 @@
 
 ## Requirements
 
-awk (gawk, nawk, mawk)
+- POSIX shell (dash, bash, ksh, zsh, etc)
+- awk (gawk, nawk, mawk, busybox awk)
 
 ## Install
 

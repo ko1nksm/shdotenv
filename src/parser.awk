@@ -73,7 +73,7 @@ function parse_single_quoted_value(str) {
 function parse_double_quoted_value(str, _variable, _new, _word) {
 	ESCAPED_CHARACTER = "\\\\."
 	META_CHARACTER = "[$`\"\\\\]"
-	VARIABLE_EXPANSION = "\\${[^}]*}"
+	VARIABLE_EXPANSION = "\\$[{][^}]*}"
 	PARAMETER_EXPANSION = "(:?-|:?\\?)"
 
 	while(match(str, ESCAPED_CHARACTER "|" META_CHARACTER "|" VARIABLE_EXPANSION)) {
@@ -91,12 +91,12 @@ function parse_double_quoted_value(str, _variable, _new, _word) {
 		}
 
 		if (match(_variable, "^" VARIABLE_EXPANSION "$")) {
-			if (!match(_variable, "^\\${" IDENTIFIER "(" PARAMETER_EXPANSION ".*)?}$")) {
+			if (!match(_variable, "^\\$[{]" IDENTIFIER "(" PARAMETER_EXPANSION ".*)?}$")) {
 				syntax_error("the variable name is not a valid identifier")
 			}
 			_word = _variable
-			gsub("^\\${" IDENTIFIER "(" PARAMETER_EXPANSION ")?|}$", "", _word)
-			if (match(_word, "[!()*<>\\[\\]{|}\\\\$]")) {
+			gsub("^\\$[{]" IDENTIFIER "(" PARAMETER_EXPANSION ")?|}$", "", _word)
+			if (match(_word, "[!()*<>\\[{|}\\\\$]|])")) {
 				syntax_error("the following characters cannot be used for parameter expansion values: !()*<>[]{|}\\$")
 			}
 		}

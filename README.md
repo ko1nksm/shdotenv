@@ -1,6 +1,6 @@
 # shdotenv
 
-.env support for shell scripts and CLI utilities (POSIX compliant)
+dotenv (.env) support for shell scripts and POSIX-compliant .env specification
 
 ## The goals of this project
 

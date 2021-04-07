@@ -209,7 +209,7 @@ Describe "dotenv posix parser"
         'FOO="escaped\$value"'        'FOO="escaped\$value"'
         'FOO="escaped\`value"'        'FOO="escaped\`value"'
         'FOO="escaped\\value"'        'FOO="escaped\\value"'
-        'FOO="foo${VAR}baz"'          'FOO="foo${VAR}baz"'
+        'FOO="foo${VAR}baz"'          'FOO="foo${VAR:-}baz"'
         'FOO="foo${VAR-default}baz"'  'FOO="foo${VAR-default}baz"'
         'FOO="foo${VAR:-default}baz"' 'FOO="foo${VAR:-default}baz"'
         'FOO="foo${VAR?err msg}baz"'  'FOO="foo${VAR?err msg}baz"'

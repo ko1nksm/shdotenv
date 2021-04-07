@@ -73,13 +73,14 @@ function parse_single_quoted_value(str) {
 function parse_double_quoted_value(str, _variable, _new, _word) {
 	ESCAPED_CHARACTER = "\\\\."
 	META_CHARACTER = "[$`\"\\\\]"
-	VARIABLE_EXPANSION = "\\$[a-zA-Z_][a-zA-Z0-9_]*"
-	VARIABLE = VARIABLE_EXPANSION_BRACE = "\\$[{][^}]*}"
+	VARIABLE_EXPANSION = "\\$[{][^}]*}"
 	PARAMETER_EXPANSION = "(:?-|:?\\?)"
 
-	if (dialect("ruby|node|go")) VARIABLE = VARIABLE_EXPANSION "|" VARIABLE
+	if (dialect("ruby|node|go")) {
+		VARIABLE_EXPANSION = "\\$" IDENTIFIER "|" VARIABLE_EXPANSION
+	}
 
-	while(match(str, ESCAPED_CHARACTER "|" VARIABLE "|" META_CHARACTER)) {
+	while(match(str, ESCAPED_CHARACTER "|" VARIABLE_EXPANSION "|" META_CHARACTER)) {
 		pos = RSTART
 		len = RLENGTH
 		_variable = substr(str, pos, len)
@@ -93,11 +94,11 @@ function parse_double_quoted_value(str, _variable, _new, _word) {
 			if (dialect("php")) _variable = unescape(_variable, "fnrtv", TRUE)
 		}
 
-		if (match(_variable, "^" VARIABLE_EXPANSION "$")) {
-			_variable = "${" substr(_variable, 2) "}"
-		}
-
-		if (match(_variable, "^" VARIABLE_EXPANSION_BRACE "$")) {
+		if (match(_variable, "^\\$" IDENTIFIER "$")) {
+			_variable = "${" substr(_variable, 2) ":-}"
+		} else if (match(_variable, "^\\$[{]" IDENTIFIER "}$")) {
+			_variable = substr(_variable, 1, length(_variable) - 1) ":-}"
+		} else if (match(_variable, "^" VARIABLE_EXPANSION "$")) {
 			if (!match(_variable, "^\\$[{]" IDENTIFIER "(" PARAMETER_EXPANSION ".*)?}$")) {
 				syntax_error("the variable name is not a valid identifier")
 			}

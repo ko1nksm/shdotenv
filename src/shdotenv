@@ -29,12 +29,12 @@ version() { echo 0.1.0; }
 usage() {
 	printf '%s\n' "Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]" "" \
 		"  -e, --env         Location of the .env file. [default: .env]" \
-		"                    Multiple -e options are allowed." \
-		"      --overload    Overloads predefined environment variables." \
-		"      --allexport   Add the exprot prefix to all environment variables." \
-		"  -k, --keyonly     Output only environment variable names." \
-		"  -v, --version     Show the version and exit." \
-		"  -h, --help        Show this message and exit."
+		"                    Multiple -e options are allowed" \
+		"      --overload    Overloads predefined environment variables" \
+		"  -a, --allexport   Exprot all variables" \
+		"  -k, --keyonly     Output only variable names" \
+		"  -v, --version     Show the version and exit" \
+		"  -h, --help        Show this message and exit"
 }
 
 abort() { echo "$@" >&2 && exit 1; }
@@ -49,7 +49,7 @@ parse_options() {
 				_shdotenv_envfiles="$_shdotenv_envfiles \"\${$_shdotenv_pos}\""
 				;;
 			--overload) _shdotenv_overload=1 ;;
-			--allexport) _shdotenv_allexport=1 ;;
+			-a | --allexport) _shdotenv_allexport=1 ;;
 			-k | --keyonly) _shdotenv_keyonly=1 ;;
 			-v | --version) version && exit 0 ;;
 			-h | --help) usage && exit 0 ;;
@@ -82,7 +82,6 @@ _shdotenv_parser=$(cat src/parser.awk) # @INCLUDE-FILE
 parse_options "$@"
 
 if [ $(($# - _shdotenv_pos + 1)) -gt 0 ]; then
-	_shdotenv_allexport=1
 	_shdotenv_env=$(exec_awk "$@")
 	shift $((_shdotenv_pos - 1))
 	set -- "$_shdotenv_env" "$@"

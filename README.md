@@ -21,6 +21,12 @@ make
 make install PREFIX=$HOME
 ```
 
+### Recommended settings
+
+```sh
+alias dotenv="shdotenv -a"
+```
+
 ## How to use
 
 ### Use as library

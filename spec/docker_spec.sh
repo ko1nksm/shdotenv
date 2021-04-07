@@ -22,4 +22,18 @@ Describe "dotenv docker parser"
       End
     End
   End
+
+  It "does not parse multi-line values"
+    data() { %text
+      #|FOO='line 1
+      #|line 2'
+    }
+    result() { %text
+      #|FOO=''\''line 1'
+    }
+    When call parse_env "$(data)"
+    The status should be failure
+    The output should eq "$(result)"
+    The error should eq "\`line 2'': not a variable definition"
+  End
 End

@@ -175,7 +175,12 @@ function parse(lines) {
 	SQ_VALUE = "'[^\\\\']*'?"
 	DQ_VALUE = "\"(\\\\\"|[^\"])*[\"]?"
 	NQ_VALUE = "[^\n]+"
-	LINE = "^[^=\n]*=?("SQ_VALUE"|"DQ_VALUE"|"NQ_VALUE")?[^\n]*([\n]|$)"
+
+	if (dialect("docker")) {
+		LINE = "^[^=\n]*=?("NQ_VALUE")?[^\n]*([\n]|$)"
+	} else {
+		LINE = "^[^=\n]*=?("SQ_VALUE"|"DQ_VALUE"|"NQ_VALUE")?[^\n]*([\n]|$)"
+	}
 
 	while (length(lines) > 0) {
 		if (sub("^[ \t\n]+", "", lines)) continue

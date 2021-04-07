@@ -1,6 +1,6 @@
 # shdotenv
 
-dotenv (.env) support for shell scripts and POSIX-compliant .env specification
+dotenv support for shell scripts and POSIX-compliant `.env` specification
 
 ## The goals of this project
 
@@ -56,6 +56,18 @@ For normal use cases, the `-a` (`--allexport`) option will be necessary. It is u
 ```sh
 alias shdotenv="shdotenv -a"
 alias dotenv="shdotenv -a" # Use as an alternative to dotenv
+```
+
+### Additional CLI utility
+
+#### contrib/dockerenv
+
+Support `.env` syntax by `--env-file` option. It supports variable expansion and multi-line environment variables.
+
+Example: (Use `dockerenv` instead of `docker`)
+
+```sh
+dockerenv run --env-file .env -it debian
 ```
 
 ## .env file syntax

@@ -33,6 +33,7 @@ usage() {
 		"      --overload    Overloads predefined environment variables" \
 		"  -a, --allexport   Exprot all variables" \
 		"  -k, --keyonly     Output only variable names" \
+		"  -q, --quiet       Suppress all output" \
 		"  -v, --version     Show the version and exit" \
 		"  -h, --help        Show this message and exit"
 }
@@ -51,6 +52,7 @@ parse_options() {
 			--overload) _shdotenv_overload=1 ;;
 			-a | --allexport) _shdotenv_allexport=1 ;;
 			-k | --keyonly) _shdotenv_keyonly=1 ;;
+			-q | --quiet) _shdotenv_quiet=1 ;;
 			-v | --version) version && exit 0 ;;
 			-h | --help) usage && exit 0 ;;
 			--) _shdotenv_pos=$((_shdotenv_pos + 1)) && break ;;
@@ -76,7 +78,7 @@ eval_env() {
 }
 
 _shdotenv_overload='' _shdotenv_allexport='' _shdotenv_keyonly=''
-_shdotenv_pos=1 _shdotenv_envfiles=''
+_shdotenv_pos=1 _shdotenv_envfiles='' _shdotenv_quiet=''
 _shdotenv_parser=$(cat src/parser.awk) # @INCLUDE-FILE
 
 parse_options "$@"
@@ -86,10 +88,11 @@ if [ $(($# - _shdotenv_pos + 1)) -gt 0 ]; then
 	shift $((_shdotenv_pos - 1))
 	set -- "$_shdotenv_env" "$@"
 	unset _shdotenv_overload _shdotenv_allexport _shdotenv_pos \
-		_shdotenv_envfiles _shdotenv_env _shdotenv_parser
+		_shdotenv_envfiles _shdotenv_quiet _shdotenv_env _shdotenv_parser
 	eval_env "$1"
 	shift
 	exec "$@"
 else
+	[ "$_shdotenv_quiet" ] && exec >/dev/null
 	exec_awk "$@"
 fi

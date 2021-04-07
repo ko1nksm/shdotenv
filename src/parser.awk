@@ -104,7 +104,7 @@ function parse_double_quoted_value(str, _variable, _new, _word) {
 			}
 			_word = _variable
 			gsub("^\\$[{]" IDENTIFIER "(" PARAMETER_EXPANSION ")?|}$", "", _word)
-			if (match(_word, "[!()*<>\\[{|}\\\\$]|])")) {
+			if (match(_word, "[!()*<>\\[{|}\\\\$]|]")) {
 				syntax_error("the following characters cannot be used for parameter expansion values: !()*<>[]{|}\\$")
 			}
 		}

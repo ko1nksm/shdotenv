@@ -185,15 +185,15 @@ function parse(lines) {
 	NQ_VALUE = "[^\n]+"
 
 	if (dialect("docker")) {
-		LINE = "^[^=\n]*=?("NQ_VALUE")?[^\n]*([\n]|$)"
+		LINE = NQ_VALUE
 	} else {
-		LINE = "^[^=\n]*=?("SQ_VALUE"|"DQ_VALUE"|"NQ_VALUE")?[^\n]*([\n]|$)"
+		LINE = SQ_VALUE "|" DQ_VALUE "|" NQ_VALUE
 	}
 
 	while (length(lines) > 0) {
 		if (sub("^[ \t\n]+", "", lines)) continue
 		if (sub("^#([^\n]+)?(\n|$)", "", lines)) continue
-		if (!match(lines, LINE) > 0) {
+		if (!match(lines, "^([^=\n]*=(" LINE ")?[^\n]*([\n]|$)|[^\n]*)")) {
 			abort(sprintf("`%s': parse error", lines))
 		}
 		CURRENT_LINE = line = chomp(substr(lines, RSTART, RLENGTH))
@@ -260,7 +260,7 @@ BEGIN {
 		while (getline < ARGV[i] > 0) {
 			lines = lines $0 "\n"
 		}
-		close(ARGV[i])
+		if (ARGV[i] != "/dev/stdin") close(ARGV[i])
 		parse(lines)
 	}
 	exit

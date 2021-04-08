@@ -96,6 +96,18 @@ Describe "dotenv posix parser"
         "FOO=value   "              'FOO="value"'
         'FOO='                      'FOO=""'
         'export FOO=value'          'export FOO="value"'
+        'FOO=#'                     'FOO="#"'
+        'FOO=%'                     'FOO="%"'
+        'FOO=+'                     'FOO="+"'
+        'FOO=,'                     'FOO=","'
+        'FOO=-'                     'FOO="-"'
+        'FOO=.'                     'FOO="."'
+        'FOO=/'                     'FOO="/"'
+        'FOO=:'                     'FOO=":"'
+        'FOO=='                     'FOO="="'
+        'FOO=@'                     'FOO="@"'
+        'FOO=^'                     'FOO="^"'
+        'FOO=_'                     'FOO="_"'
       End
 
       It "parses value the \`$1'"
@@ -106,14 +118,25 @@ Describe "dotenv posix parser"
 
     Describe
       Parameters
-        "FOO=foo bar"     "\`FOO=foo bar': spaces are not allowed without quoting"
-        "FOO=   foo"      "\`FOO=   foo': spaces are not allowed without quoting"
+        "FOO=foo bar"
+        "FOO=   foo"
+        "FOO=${HT}foo"
       End
 
       It "does not parse value the \`$1'"
-        When call parse_env "$1"
+        When call parse_env "FOO=$1"
         The status should be failure
-        The error should eq "$2"
+        The error should eq "\`FOO=$1': spaces are not allowed without quoting"
+      End
+    End
+
+    Describe
+      Parameters:value "!" "\$" "&" "(" ")" "*" ";" "<" ">" "?" "[" "\\" "]" "\`" "{" "|" "}" "~"
+
+      It "does not parse value the \`$1'"
+        When call parse_env "FOO=$1"
+        The status should be failure
+        The error should eq "\`FOO=$1': using without quotes is not allowed: {}[]()<>\"'\`!$&~|;\\*?"
       End
     End
   End
@@ -186,6 +209,7 @@ Describe "dotenv posix parser"
         "FOO='#value'# comment"   "\`FOO='#value'# comment': spaces are required before the end-of-line comment"
         "FOO='#va'lue'"           "\`FOO='#va'lue'': using single quote not allowed in the single quoted value"
         "FOO='value"              "\`FOO='value': unterminated quoted string"
+        "FOO=\"value"             "\`FOO=\"value': unterminated quoted string"
       End
 
       It "does not parse value the \`$1'"

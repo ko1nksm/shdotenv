@@ -38,7 +38,7 @@ spec_helper_configure() {
   if [ "${SHDOTENV_AWK##*/}" = "gawk" ]; then
     awk() { env "$SHDOTENV_AWK" "$@"; }
   elif env "$SHDOTENV_AWK" -V > /dev/null 2>&1; then
-    awk() { env "$SHDOTENV_AWK" --posix "$@"; }
+    awk() { env "$SHDOTENV_AWK" --traditional "$@"; }
   else
     awk() { env "$SHDOTENV_AWK" "$@"; }
   fi

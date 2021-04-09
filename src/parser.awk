@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/awk -f
 
 # MIT License
 #
@@ -22,8 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-true && exec awk "-f" "$0" "$@"
-
 function abort(msg) {
   print msg > "/dev/stderr"
   exit 1
@@ -32,10 +30,6 @@ function abort(msg) {
 function syntax_error(msg) {
   sub("[\n]+$", "", CURRENT_LINE)
   abort(sprintf("`%s': %s", CURRENT_LINE, msg))
-}
-
-function debug(msg) {
-  print "<debug>" msg "</debug>" > "/dev/tty"
 }
 
 function dialect(name) {

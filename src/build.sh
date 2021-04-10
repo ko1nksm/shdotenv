@@ -23,10 +23,4 @@ while IFS= read -r line; do
       ;;
     *) printf '%s\n' "$line" ;;
   esac
-done | {
-  echo "#!/bin/sh"
-  echo "# Copyright (c) 2021 Koichi Nakashima"
-  echo "# shdotenv is released under the MIT license"
-  echo "# https://opensource.org/licenses/MIT"
-  shfmt -mn -ln posix
-}
+done

@@ -1,7 +1,7 @@
 PREFIX ?= /usr/local
 BINDIR := $(PREFIX)/bin
 
-.PHONY: build check test package clean install uninstall
+.PHONY: build check test dist clean install uninstall
 
 build:
 	cat LICENSE.build > ./shdotenv
@@ -15,7 +15,7 @@ check:
 test: check
 	shellspec +q
 
-package:
+dist: build
 	tar czf shdotenv.tar.gz shdotenv
 
 clean:

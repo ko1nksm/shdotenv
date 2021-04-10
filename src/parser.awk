@@ -112,8 +112,8 @@ function parse_unquoted_value(str) {
     syntax_error("spaces are not allowed without quoting")
   }
 
-  if (match(str, "[{}\\[()<>\"'`!$&~|;\\\\*?]|]")) {
-    syntax_error("using without quotes is not allowed: {}[]()<>\"'`!$&~|;\\*?")
+  if (match(str, "[][{}()<>\"'`!$&~|;\\\\*?]")) {
+    syntax_error("using without quotes is not allowed: !$&()*;<>?[\\]`{|}~")
   }
   return parse_double_quoted_value(str)
 }

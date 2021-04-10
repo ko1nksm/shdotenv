@@ -94,25 +94,20 @@ Describe "dotenv posix parser"
         "FOO=#value # comment"      'FOO="#value"'
         "FOO=#value#no-comment"     'FOO="#value#no-comment"'
         "FOO=value   "              'FOO="value"'
-        'FOO='                      'FOO=""'
         'export FOO=value'          'export FOO="value"'
-        'FOO=#'                     'FOO="#"'
-        'FOO=%'                     'FOO="%"'
-        'FOO=+'                     'FOO="+"'
-        'FOO=,'                     'FOO=","'
-        'FOO=-'                     'FOO="-"'
-        'FOO=.'                     'FOO="."'
-        'FOO=/'                     'FOO="/"'
-        'FOO=:'                     'FOO=":"'
-        'FOO=='                     'FOO="="'
-        'FOO=@'                     'FOO="@"'
-        'FOO=^'                     'FOO="^"'
-        'FOO=_'                     'FOO="_"'
       End
 
       It "parses value the \`$1'"
         When call parse_env "$1"
         The output should eq "$2"
+      End
+    End
+
+    Describe
+      Parameters:value "#" "%" "+" "," "-" "." "/" ":" "=" "@" "^" "_" ""
+      It "parses value the \`$1'"
+        When call parse_env "FOO=$1"
+        The output should eq "FOO=\"$1\""
       End
     End
 
@@ -136,7 +131,7 @@ Describe "dotenv posix parser"
       It "does not parse value the \`$1'"
         When call parse_env "FOO=$1"
         The status should be failure
-        The error should eq "\`FOO=$1': using without quotes is not allowed: {}[]()<>\"'\`!$&~|;\\*?"
+        The error should eq "\`FOO=$1': using without quotes is not allowed: !\$&()*;<>?[\\]\`{|}~"
       End
     End
   End

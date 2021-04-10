@@ -11,14 +11,29 @@ dotenv support for shell scripts and POSIX-compliant `.env` specification
 
 ## Requirements
 
+`shdotenv` is a single file shell script with embedded awk script.
+
 - POSIX shell (dash, bash, ksh, zsh, etc)
 - awk (gawk, nawk, mawk, busybox awk)
 
 ## Install
 
+Download `shdotenv` (shell script) from [releases](https://github.com/ko1nksm/shdotenv/releases).
+
 ```console
-make
-make install PREFIX=$HOME
+$ wget https://github.com/ko1nksm/shdotenv/releases/download/[TAG]/shdotenv -O $HOME/bin/shdotenv
+$ chmod +x $HOME/bin/shdotenv
+```
+
+### Build your own
+
+Requires [shfmt](https://github.com/mvdan/sh).
+
+```console
+$ git clone https://github.com/ko1nksm/shdotenv.git
+$ cd shdotenv
+$ make
+$ make install PREFIX=$HOME
 ```
 
 ## How to use
@@ -97,7 +112,7 @@ export EXPORT2 # Equivalent to: export EXPORT2="${EXPORT2:-}"
 - Spaces before and after `=` are not allowed
 - Quoting is not required, but spaces and some symbols are not allowed
 - Single-quoted values cannot contains single quote in it
-- The following characters in double quoted values must be escaped with `\`: $`"\
+- The following characters in double quoted values must be escaped with `\`: <code> $ ` " \ </code>
 - No support for backslash escapes except for the above (i.e., `\n` is not a newline)
 - Variable expansion is only available if it is double-quoted
 - Bracing is required for variable expansion (Only `${VAR}` is supported)

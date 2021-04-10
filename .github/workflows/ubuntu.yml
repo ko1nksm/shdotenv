@@ -1,0 +1,31 @@
+name: Ubuntu
+
+on: [push, pull_request]
+
+env:
+  FORCE_COLOR: 1
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y dash bash busybox ksh mksh posh yash zsh gawk mawk original-awk
+      - name: Install shellspec
+        run: |
+          echo "${HOME}/.local/bin" >> "$GITHUB_PATH"
+          curl -fsSL https://git.io/shellspec | sh -s master -y
+      - run: shellspec -s sh
+      - run: shellspec -s dash
+      - run: shellspec -s bash
+      - run: shellspec -s "busybox ash"
+      - run: shellspec -s ksh
+      - run: shellspec -s mksh
+      - run: shellspec -s posh
+      - run: shellspec -s yash
+      - run: shellspec -s zsh
+      - run: shellspec -s sh -e SHDOTENV_AWK=gawk
+      - run: shellspec -s sh -e SHDOTENV_AWK=mawk
+      - run: shellspec -s sh -e SHDOTENV_AWK=original-awk

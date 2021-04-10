@@ -47,7 +47,7 @@ Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]
   -e, --env         Location of the .env file [default: .env]
                     Multiple -e options are allowed
       --overload    Overload predefined environment variables
-  -a, --allexport   Exprot all variables
+  -n, --noexport    Do not export keys without export prefix
   -k, --keyonly     Output only variable names
   -q, --quiet       Suppress all output
   -v, --version     Show the version and exit
@@ -64,13 +64,6 @@ eval "$(shdotenv [OPTION]...)"
 
 ```sh
 shdotenv [OPTION]... <COMMAND> [ARGUMENTS]...
-```
-
-For normal use cases, the `-a` (`--allexport`) option will be necessary. It is useful to define alias.
-
-```sh
-alias shdotenv="shdotenv -a"
-alias dotenv="shdotenv -a" # Use as an alternative to dotenv
 ```
 
 ### Additional CLI utility

@@ -68,7 +68,6 @@ function parse_double_quoted_value(str, _variable, _new, _word) {
   ESCAPED_CHARACTER = "\\\\."
   META_CHARACTER = "[$`\"\\\\]"
   VARIABLE_EXPANSION = "\\$[{][^}]*}"
-  PARAMETER_EXPANSION = "(:?-|:?\\?)"
 
   if (dialect("ruby|node|go")) {
     VARIABLE_EXPANSION = "\\$" IDENTIFIER "|" VARIABLE_EXPANSION
@@ -93,13 +92,8 @@ function parse_double_quoted_value(str, _variable, _new, _word) {
     } else if (match(_variable, "^\\$[{]" IDENTIFIER "}$")) {
       _variable = substr(_variable, 1, length(_variable) - 1) ":-}"
     } else if (match(_variable, "^" VARIABLE_EXPANSION "$")) {
-      if (!match(_variable, "^\\$[{]" IDENTIFIER "(" PARAMETER_EXPANSION ".*)?}$")) {
+      if (!match(_variable, "^\\$[{]" IDENTIFIER "}$")) {
         syntax_error("the variable name is not a valid identifier")
-      }
-      _word = _variable
-      gsub("^\\$[{]" IDENTIFIER "(" PARAMETER_EXPANSION ")?|}$", "", _word)
-      if (match(_word, "[!()*<>\\[{|}\\\\$]|]")) {
-        syntax_error("the following characters cannot be used for parameter expansion values: !()*<>[]{|}\\$")
       }
     }
     _new = _new substr(str, 1, pos - 1) _variable

@@ -234,10 +234,6 @@ Describe "dotenv posix parser"
         'FOO="escaped\`value"'        'FOO="escaped\`value"'
         'FOO="escaped\\value"'        'FOO="escaped\\value"'
         'FOO="foo${VAR}baz"'          'FOO="foo${VAR:-}baz"'
-        'FOO="foo${VAR-default}baz"'  'FOO="foo${VAR-default}baz"'
-        'FOO="foo${VAR:-default}baz"' 'FOO="foo${VAR:-default}baz"'
-        'FOO="foo${VAR?err msg}baz"'  'FOO="foo${VAR?err msg}baz"'
-        'FOO="foo${VAR:?err msg}baz"' 'FOO="foo${VAR:?err msg}baz"'
         'FOO="escaped\nvalue"'        'FOO="escaped\nvalue"'
       End
 
@@ -311,7 +307,8 @@ Describe "dotenv posix parser"
         'FOO="#value"# comment' "\`FOO=\"#value\"# comment': spaces are required before the end-of-line comment"
         'FOO="value'            "\`FOO=\"value': unterminated quoted string"
         'FOO="$VAR"'            "\`FOO=\"\$VAR\"': the following metacharacters must be escaped: \$\`\"\\"
-        'FOO="${VAR-$}"'        "\`FOO=\"\${VAR-\$}\"': the following characters cannot be used for parameter expansion values: !()*<>[]{|}\\\$"
+        'FOO="${VAR-}"'         "\`FOO=\"\${VAR-}\"': the variable name is not a valid identifier"
+        'FOO="${VAR?}"'         "\`FOO=\"\${VAR?}\"': the variable name is not a valid identifier"
         'FOO="val"ue"'          "\`FOO=\"val\"ue\"': the following metacharacters must be escaped: \$\`\"\\"
       End
 

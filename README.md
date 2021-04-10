@@ -87,9 +87,7 @@ line3"
 LONGLINE="https://github.com/ko1nksm\
 /shdotenv/blob/main/README.md"
 
-DB_USER="${USER}"
-DB_PASS="${PASS:?password required}" # Required Keys: ${VAR?msg} and ${VAR:?msg}
-DB_PORT="${PORT:-3306}" # Default values: ${VAR:default} and ${VAR:-default}
+ENDPOINT="http://${HOST}/api"
 
 export EXPORT1="value"
 export EXPORT2 # Equivalent to: export EXPORT2="${EXPORT2:-}"

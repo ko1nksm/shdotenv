@@ -1,13 +1,13 @@
 # shdotenv
 
-dotenv support for shell scripts and POSIX-compliant `.env` specification
+dotenv support for shell scripts and POSIX-compliant `.env` syntax specification.
 
 ## The goals of this project
 
-1. Provide a library that can safely load .env from shell scripts
+1. Provide a library that can safely load .env file from shell scripts
 2. Provide language-independent CLI utilities
-3. Define .env syntax for POSIX shell script compatible
-4. Support for .env dialects for interoperation
+3. Define POSIX shell script compatible .env syntax specification
+4. Support for .env syntax dialects for interoperation
 
 ## Requirements
 

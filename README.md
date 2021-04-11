@@ -136,3 +136,5 @@ Reports of problems are welcome.
 - python: [python-dotenv](https://github.com/theskumar/python-dotenv)
 - php: [phpdotenv](https://github.com/vlucas/phpdotenv)
 - go: [godotenv](https://github.com/joho/godotenv)
+
+[Comparing Dialects](docs/dialects.md)

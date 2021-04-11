@@ -1,12 +1,12 @@
 # shdotenv
 
-dotenv support for shell scripts and POSIX-compliant `.env` syntax specification.
+dotenv support for shell and POSIX-compliant `.env` syntax specification.
 
 ## The goals of this project
 
 1. Provide a library that can safely load .env file from shell scripts
 2. Provide language-independent CLI utilities
-3. Define POSIX shell script compatible .env syntax specification
+3. Define POSIX shell compatible .env syntax specification
 4. Support for .env syntax dialects for interoperation
 
 ## Requirements
@@ -43,15 +43,19 @@ $ make install PREFIX=$HOME
 ```
 Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]
 
-  -d, --dialect     Specify the .env dialect [default: posix]
-  -e, --env         Location of the .env file [default: .env]
-                    Multiple -e options are allowed
-      --overload    Overload predefined environment variables
-  -n, --noexport    Do not export keys without export prefix
-  -k, --keyonly     Output only variable names
-  -q, --quiet       Suppress all output
-  -v, --version     Show the version and exit
-  -h, --help        Show this message and exit
+  -d, --dialect DIALECT  Specify the .env dialect [default: posix]
+                           (posix, ruby, node, python, php, go, docker)
+  -s, --shell SHELL      Output in the specified shell format [default: posix]
+                           (posix, fish)
+  -e, --env ENV_PATH     Location of the .env file [default: .env]
+                           Multiple -e options are allowed
+      --overload         Overload predefined environment variables
+  -n, --noexport         Do not export keys without export prefix
+  -g, --grep PATTERN     Output only those that match the regexp pattern
+  -k, --keyonly          Output only variable names
+  -q, --quiet            Suppress all output
+  -v, --version          Show the version and exit
+  -h, --help             Show this message and exit
 ```
 
 ### Use as library
@@ -116,7 +120,9 @@ TODO: ~~For detailed specifications, see~~
 
 The formal `.env` syntax for this project is `posix` only.
 The `posix` is a subset of the POSIX shell and is compatible with shell scripts.
-Support for other .env dialects is for interoperability purposes and is not fully compatible.
+Support for other .env syntax dialects is for interoperability purposes.
+Compatibility will be improved gradually, but is not fully compatible.
+Reports of problems are welcome.
 
 - docker: [docker](https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file)
 - ruby: [dotenv](https://github.com/bkeepers/dotenv)

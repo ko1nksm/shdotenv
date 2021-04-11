@@ -7,8 +7,8 @@ Describe "dotenv ruby parser"
   Context "when the key is given"
     Describe
       Parameters
-        '  FOO=bar'                 'FOO="bar"'
-        'FOO  =bar'                 'FOO="bar"'
+        '  FOO=bar'                 "FOO='bar'"
+        'FOO  =bar'                 "FOO='bar'"
       End
 
       It "parses value the \`$1'"
@@ -19,12 +19,15 @@ Describe "dotenv ruby parser"
   End
 
   Context "when the double quoted value is given"
+    Before "export VAR=123"
+
     Describe
       Parameters
-        'VALUE="foo\abar"'        'VALUE="fooabar"'
-        'VALUE="foo\nbar"'        'VALUE="foo'"$LF"'bar"'
-        'VALUE="foo\rbar"'        'VALUE="foo'"$CR"'bar"'
-        'FOO="$VAR"'              'FOO="${VAR:-}"'
+        'VALUE="foo\abar"'        "VALUE='fooabar'"
+        'VALUE="foo\nbar"'        "VALUE='foo${LF}bar'"
+        'VALUE="foo\rbar"'        "VALUE='foo${CR}bar'"
+        'FOO="$VAR"'              "FOO='123'"
+        'FOO="${VAR}"'            "FOO='123'"
       End
 
       It "parses value the \`$1'"

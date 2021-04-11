@@ -5,7 +5,7 @@
 # so it is better to set them here.
 set -eu
 
-SHDOTENV_AWK=${SHDOTENV_AWK:-awk}
+AWK=${AWK:-awk}
 
 # This callback function will be invoked only once before loading specfiles.
 spec_helper_precheck() {
@@ -13,7 +13,7 @@ spec_helper_precheck() {
   # Available variables: VERSION, SHELL_TYPE, SHELL_VERSION
   : minimum_version "0.29.0"
 
-  if ! env "$SHDOTENV_AWK" "" 2>/dev/null; then
+  if ! env "$AWK" "" 2>/dev/null; then
     abort "awk not found"
   fi
 }
@@ -35,11 +35,11 @@ spec_helper_configure() {
   VT=$SHELLSPEC_VT    # \v 0x0B
   CR=$SHELLSPEC_CR    # \r 0x0D
 
-  if [ "${SHDOTENV_AWK##*/}" = "gawk" ]; then
-    awk() { env "$SHDOTENV_AWK" "$@"; }
-  elif env "$SHDOTENV_AWK" -V > /dev/null 2>&1; then
-    awk() { env "$SHDOTENV_AWK" --traditional "$@"; }
+  if [ "${AWK##*/}" = "gawk" ]; then
+    awk() { env "$AWK" "$@"; }
+  elif env "$AWK" -V > /dev/null 2>&1; then
+    awk() { env "$AWK" --traditional "$@"; }
   else
-    awk() { env "$SHDOTENV_AWK" "$@"; }
+    awk() { env "$AWK" "$@"; }
   fi
 }

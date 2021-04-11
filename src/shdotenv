@@ -69,7 +69,10 @@ _shdotenv_parser=$(cat src/parser.awk) # @INCLUDE-FILE
 
 parse_options "$@"
 
-if [ $(($# - _shdotenv_pos + 1)) -gt 0 ]; then
+if [ $(($# - _shdotenv_pos + 1)) -eq 0 ] || [ "$_shdotenv_keyonly" ]; then
+  [ "$_shdotenv_quiet" ] && exec >/dev/null
+  exec_awk "$@"
+else
   _shdotenv_env=$(exec_awk "$@")
   shift $((_shdotenv_pos - 1))
   set -- "$_shdotenv_env" "$@"
@@ -79,7 +82,4 @@ if [ $(($# - _shdotenv_pos + 1)) -gt 0 ]; then
   eval_env "$1"
   shift
   exec "$@"
-else
-  [ "$_shdotenv_quiet" ] && exec >/dev/null
-  exec_awk "$@"
 fi

@@ -10,7 +10,7 @@ Describe "dotenv posix parser"
       #|FOO=bar
     }
     When call parse_env "$(data)"
-    The output should eq 'FOO="bar"'
+    The output should eq "FOO='bar'"
   End
 
   It "ignores comment lines"
@@ -20,7 +20,7 @@ Describe "dotenv posix parser"
       #|FOO=bar
     }
     When call parse_env "$(data)"
-    The output should eq 'FOO="bar"'
+    The output should eq "FOO='bar'"
   End
 
   It "don't accept unknown dialect"
@@ -39,7 +39,7 @@ Describe "dotenv posix parser"
       #|FOO=value
     }
     When call parse_env "$(data)"
-    The output should eq 'FOO="value"'
+    The output should eq "FOO='value'"
     The status should be success
   End
 
@@ -56,12 +56,12 @@ Describe "dotenv posix parser"
   Context "when the key is given"
     Describe
       Parameters
-        '  FOO=bar'                 'FOO="bar"'
-        'FOO_BAR=value'             'FOO_BAR="value"'
-        'FOO1=value'                'FOO1="value"'
-        'export FOO'                'export FOO'
-        'export FOO BAR'            'export FOO BAR'
-        'export FOO BAR # comment'  'export FOO BAR'
+        '  FOO=bar'                 "FOO='bar'"
+        'FOO_BAR=value'             "FOO_BAR='value'"
+        'FOO1=value'                "FOO1='value'"
+        'export FOO'                "export FOO"
+        'export FOO BAR'            "export FOO BAR"
+        'export FOO BAR # comment'  "export FOO BAR"
       End
 
       It "parses value the \`$1'"
@@ -90,11 +90,11 @@ Describe "dotenv posix parser"
   Context "when the unquoted value is given"
     Describe
       Parameters
-        'FOO=value'                 'FOO="value"'
-        "FOO=#value # comment"      'FOO="#value"'
-        "FOO=#value#no-comment"     'FOO="#value#no-comment"'
-        "FOO=value   "              'FOO="value"'
-        'export FOO=value'          'export FOO="value"'
+        'FOO=value'                 "FOO='value'"
+        "FOO=#value # comment"      "FOO='#value'"
+        "FOO=#value#no-comment"     "FOO='#value#no-comment'"
+        "FOO=value   "              "FOO='value'"
+        'export FOO=value'          "export FOO='value'"
       End
 
       It "parses value the \`$1'"
@@ -107,7 +107,7 @@ Describe "dotenv posix parser"
       Parameters:value "#" "%" "+" "," "-" "." "/" ":" "=" "@" "^" "_" ""
       It "parses value the \`$1'"
         When call parse_env "FOO=$1"
-        The output should eq "FOO=\"$1\""
+        The output should eq "FOO='$1'"
       End
     End
 
@@ -218,24 +218,70 @@ Describe "dotenv posix parser"
   Context "when the double quoted value is given"
     Describe
       Parameters
-        'FOO="value"'                 'FOO="value"'
-        'FOO="#value" # comment'      'FOO="#value"'
-        'FOO="#value # comment"'      'FOO="#value # comment"'
-        'FOO="value"   '              'FOO="value"'
-        'FOO=""'                      'FOO=""'
-        'export FOO="value"'          'export FOO="value"'
-        'FOO="escaped\"value"'        'FOO="escaped\"value"'
-        'FOO="escaped\$value"'        'FOO="escaped\$value"'
-        'FOO="escaped\`value"'        'FOO="escaped\`value"'
-        'FOO="escaped\\value"'        'FOO="escaped\\value"'
-        'FOO="foo${VAR}baz"'          'FOO="foo${VAR:-}baz"'
-        'FOO="escaped\nvalue"'        'FOO="escaped\nvalue"'
+        'FOO="value"'                 "FOO='value'"
+        'FOO="#value" # comment'      "FOO='#value'"
+        'FOO="#value # comment"'      "FOO='#value # comment'"
+        'FOO="value"   '              "FOO='value'"
+        'FOO=""'                      "FOO=''"
+        'export FOO="value"'          "export FOO='value'"
+        'FOO="escaped\"value"'        "FOO='escaped\"value'"
+        'FOO="escaped\$value"'        "FOO='escaped\$value'"
+        'FOO="escaped\`value"'        "FOO='escaped\`value'"
+        'FOO="escaped\\value"'        "FOO='escaped\\value'"
+        'FOO="escaped\nvalue"'        "FOO='escaped\nvalue'"
       End
 
       It "parses value the \`$1'"
         When call parse_env "$1"
         The output should eq "$2"
       End
+    End
+
+    It "expands variables"
+      BeforeCall "unset VAR FOO ||:"
+      data() { %text
+        #|VAR=123
+        #|FOO="[${VAR}]"
+      }
+      result() { %text
+        #|VAR='123'
+        #|FOO='[123]'
+      }
+      When call parse_env "$(data)"
+      The output should eq "$(result)"
+    End
+
+    It "expands variables with exported values"
+      BeforeCall "export VAR=456"
+      data() { %text
+        #|FOO="[${VAR}]"
+      }
+      result() { %text
+        #|FOO='[456]'
+      }
+      When call parse_env "$(data)"
+      The output should eq "$(result)"
+    End
+
+    It "does not overload the exported value unless in overload mode"
+      BeforeCall "export FOO=123"
+      data() { %text
+        #|FOO=456
+      }
+      When call parse_env "$(data)" -v OVERLOAD=0
+      The output should eq ""
+    End
+
+    It "overloads the exported value in overload mode"
+      BeforeCall "export FOO=123"
+      data() { %text
+        #|FOO=456
+      }
+      result() { %text
+        #|FOO='456'
+      }
+      When call parse_env "$(data)" -v OVERLOAD=1
+      The output should eq "$(result)"
     End
 
     It "parses multi-line values"
@@ -245,9 +291,9 @@ Describe "dotenv posix parser"
         #|line 3"
       }
       result() { %text
-        #|export FOO="line 1
+        #|export FOO='line 1
         #|line 2
-        #|line 3"
+        #|line 3'
       }
       When call parse_env "$(data)"
       The output should eq "$(result)"
@@ -260,9 +306,9 @@ Describe "dotenv posix parser"
         #|line 3"  # comment
       }
       result() { %text
-        #|export FOO="line 1
+        #|export FOO='line 1
         #|line 2
-        #|line 3"
+        #|line 3'
       }
       When call parse_env "$(data)"
       The output should eq "$(result)"
@@ -290,8 +336,7 @@ Describe "dotenv posix parser"
         #|line 2"  # comment
       }
       result() { %text
-        #|export FOO="line 1\
-        #|line 2"
+        #|export FOO='line 1line 2'
       }
       When call parse_env "$(data)"
       The output should eq "$(result)"

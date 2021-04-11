@@ -7,8 +7,8 @@ Describe "dotenv php parser"
   Context "when the key is given"
     Describe
       Parameters
-        '  FOO=bar'                 'FOO="bar"'
-        'FOO  =bar'                 'FOO="bar"'
+        '  FOO=bar'                 "FOO='bar'"
+        'FOO  =bar'                 "FOO='bar'"
       End
 
       It "parses value the \`$1'"
@@ -21,12 +21,12 @@ Describe "dotenv php parser"
   Context "when the double quoted value is given"
     Describe
       Parameters
-        'VALUE="foo\fbar"'        'VALUE="foo'"$FF"'bar"'
-        'VALUE="foo\nbar"'        'VALUE="foo'"$LF"'bar"'
-        'VALUE="foo\rbar"'        'VALUE="foo'"$CR"'bar"'
-        'VALUE="foo\tbar"'        'VALUE="foo'"$HT"'bar"'
-        'VALUE="foo\vbar"'        'VALUE="foo'"$VT"'bar"'
-        'VALUE="foo\zbar"'        'VALUE="foo\zbar"'
+        'VALUE="foo\fbar"'        "VALUE='foo${FF}bar'"
+        'VALUE="foo\nbar"'        "VALUE='foo${LF}bar'"
+        'VALUE="foo\rbar"'        "VALUE='foo${CR}bar'"
+        'VALUE="foo\tbar"'        "VALUE='foo${HT}bar'"
+        'VALUE="foo\vbar"'        "VALUE='foo${VT}bar'"
+        'VALUE="foo\zbar"'        "VALUE='foo\zbar'"
       End
 
       It "parses value the \`$1'"

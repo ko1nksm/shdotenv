@@ -7,8 +7,8 @@ Describe "dotenv node parser"
   Context "when the key is given"
     Describe
       Parameters
-        '  FOO=bar'                 'FOO="bar"'
-        'FOO  =bar'                 'FOO="bar"'
+        '  FOO=bar'                 "FOO='bar'"
+        'FOO  =bar'                 "FOO='bar'"
       End
 
       It "parses value the \`$1'"
@@ -19,11 +19,13 @@ Describe "dotenv node parser"
   End
 
   Context "when the double quoted value is given"
+    Before "export VAR=123"
+
     Describe
       Parameters
-        'VALUE="foo\abar"'        'VALUE="foo\abar"'
-        'VALUE="foo\nbar"'        'VALUE="foo'"$LF"'bar"'
-        'FOO="$VAR"'              'FOO="${VAR:-}"'
+        'VALUE="foo\abar"'        "VALUE='foo\abar'"
+        'VALUE="foo\nbar"'        "VALUE='foo${LF}bar'"
+        'FOO="$VAR"'              "FOO='123'"
       End
 
       It "parses value the \`$1'"

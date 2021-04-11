@@ -42,7 +42,11 @@ function parse_single_quoted_value(str) {
   return str
 }
 
-function parse_double_quoted_value(str, _variable, _new, _word) {
+function expand_env(key) {
+  return (key in ENVIRON) ? ENVIRON[key] : ""
+}
+
+function parse_double_quoted_value(str,  variable, new) {
   ESCAPED_CHARACTER = "\\\\."
   META_CHARACTER = "[$`\"\\\\]"
   VARIABLE_EXPANSION = "\\$[{][^}]*}"
@@ -54,35 +58,31 @@ function parse_double_quoted_value(str, _variable, _new, _word) {
   while(match(str, ESCAPED_CHARACTER "|" VARIABLE_EXPANSION "|" META_CHARACTER)) {
     pos = RSTART
     len = RLENGTH
-    _variable = substr(str, pos, len)
+    variable = substr(str, pos, len)
 
-    if (match(_variable, "^" META_CHARACTER "$")) {
+    if (match(variable, "^" META_CHARACTER "$")) {
       syntax_error("the following metacharacters must be escaped: $`\"\\")
-    } else if (match(_variable, "^" ESCAPED_CHARACTER "$")) {
-      if (dialect("ruby|go")) _variable = unescape(_variable, "nr", FALSE)
-      if (dialect("node")) _variable = unescape(_variable, "n", TRUE)
-      if (dialect("python")) _variable = unescape(_variable, "abfnrtv", TRUE)
-      if (dialect("php")) _variable = unescape(_variable, "fnrtv", TRUE)
+    } else if (match(variable, "^" ESCAPED_CHARACTER "$")) {
+      if (dialect("posix")) variable = unescape(variable, "$`\"\\\n", TRUE)
+      if (dialect("ruby|go")) variable = unescape(variable, "nr", FALSE)
+      if (dialect("node")) variable = unescape(variable, "n", TRUE)
+      if (dialect("python")) variable = unescape(variable, "abfnrtv", TRUE)
+      if (dialect("php")) variable = unescape(variable, "fnrtv", TRUE)
     }
 
-    if (match(_variable, "^\\$" IDENTIFIER "$")) {
-      _variable = "${" substr(_variable, 2) ":-}"
-    } else if (match(_variable, "^\\$[{]" IDENTIFIER "}$")) {
-      _variable = substr(_variable, 1, length(_variable) - 1) ":-}"
-    } else if (match(_variable, "^" VARIABLE_EXPANSION "$")) {
-      if (!match(_variable, "^\\$[{]" IDENTIFIER "}$")) {
+    if (match(variable, "^\\$" IDENTIFIER "$")) {
+      variable = expand_env(substr(variable, 2))
+    } else if (match(variable, "^\\$[{]" IDENTIFIER "}$")) {
+      variable = expand_env(substr(variable, 3, length(variable) - 3))
+    } else if (match(variable, "^" VARIABLE_EXPANSION "$")) {
+      if (!match(variable, "^\\$[{]" IDENTIFIER "}$")) {
         syntax_error("the variable name is not a valid identifier")
       }
     }
-    _new = _new substr(str, 1, pos - 1) _variable
+    new = new substr(str, 1, pos - 1) variable
     str = substr(str, pos + len)
   }
-  return _new str
-}
-
-function parse_raw_value(str) {
-  gsub("'", "'\\''", str)
-  return str
+  return new str
 }
 
 function parse_unquoted_value(str) {
@@ -96,19 +96,19 @@ function parse_unquoted_value(str) {
   return parse_double_quoted_value(str)
 }
 
-function remove_optional_comment(value, len, _rest) {
-  _rest = substr(value, len + 1)
-  if (match(_rest, "^#.*")) {
+function remove_optional_comment(value, len,  rest) {
+  rest = substr(value, len + 1)
+  if (match(rest, "^#.*")) {
     syntax_error("spaces are required before the end-of-line comment")
   }
-  sub("^([ \t]+#.*|[ \t]*)$", "", _rest)
-  return substr(value, 1, len) _rest
+  sub("^([ \t]+#.*|[ \t]*)$", "", rest)
+  return substr(value, 1, len) rest
 }
 
-function unescape(str, escape, keep, _escape, _idx) {
-  split(escape, _escape, "")
-  for (_idx in _escape) {
-    escape = _escape[_idx]
+function unescape(str, escape, keep,  escapes, idx) {
+  split(escape, escapes, "")
+  for (idx in escapes) {
+    escape = escapes[idx]
     if (str == "\\" escape) return ESCAPE[escape]
   }
   return (keep ? str : substr(str, 2))
@@ -132,16 +132,22 @@ function chomp(str) {
   return str
 }
 
-function output(export, key, expand, value, overload, _quote) {
+function output_key(export, key) {
   if (KEYONLY) {
     print key
-  } else if (length(expand) == 0) {
-    print (export ? "export " : "unset ") key
   } else {
-    if (!overload) printf "[ \"${" key "+x}\" ] || "
-    if (export) printf "export "
-    _quote = (expand ? "\"" : "'")
-    print key "=" _quote value _quote
+    print (export ? "export " : "unset ") key
+  }
+}
+
+function output_key_value(export, key, value) {
+  if (KEYONLY) {
+    print key
+  } else {
+    if (!OVERLOAD && key in ENVIRON) return
+    ENVIRON[key] = value
+    gsub("'", "'\\''", value)
+    print (export ? "export " : "") key "='" value "'"
   }
 }
 
@@ -169,7 +175,7 @@ function parse(lines) {
       if (!sub("^export[ \t]+", "", line)) {
         syntax_error("not a variable definition")
       }
-      output(DOEXPORT, parse_key_only(line))
+      output_key(DOEXPORT, parse_key_only(line))
     } else {
       export = ALLEXPORT
       key = parse_key(substr(line, 1, equal_pos - 1))
@@ -177,22 +183,21 @@ function parse(lines) {
       if (sub("^export[ \t]+", "", key)) export = DOEXPORT
 
       if (dialect("docker")) {
-        value = parse_raw_value(value)
-        output(export, key, NOEXPAND, value, OVERLOAD)
+        output_key_value(export, key, value)
       } else if (match(value, "^"SQ_VALUE)) {
         value = remove_optional_comment(value, RLENGTH)
         value = parse_single_quoted_value(unquote(value, "'"))
-        output(export, key, NOEXPAND, value, OVERLOAD)
+        output_key_value(export, key, value)
       } else if (match(value, "^"DQ_VALUE)) {
         value = remove_optional_comment(value, RLENGTH)
         value = parse_double_quoted_value(unquote(value, "\""))
-        output(export, key, DOEXPAND, value, OVERLOAD)
+        output_key_value(export, key, value)
       } else {
         if (match(value, "[ \t]#")) {
           value = remove_optional_comment(value, RSTART - 1)
         }
         value = parse_unquoted_value(rtrim(value))
-        output(export, key, DOEXPAND, value, OVERLOAD)
+        output_key_value(export, key, value)
       }
     }
   }
@@ -203,6 +208,11 @@ BEGIN {
   TRUE  = DOEXPORT = DOEXPAND = 1
   FALSE = NOEXPORT = NOEXPAND = 0
 
+  ESCAPE["$"] = "$"
+  ESCAPE["`"] = "`"
+  ESCAPE["\""] = "\""
+  ESCAPE["\\"] = "\\"
+  ESCAPE["\n"] = ""
   ESCAPE["a"] = "\a"
   ESCAPE["b"] = "\b"
   ESCAPE["f"] = "\f"

@@ -9,7 +9,7 @@ build:
 	chmod +x ./shdotenv
 
 check:
-	shfmt -w -ci -ln posix src/build.sh src/shdotenv
+	shfmt -w -ci -i 2 -ln posix src/build.sh src/shdotenv
 	shellcheck src/build.sh src/shdotenv
 
 test: check

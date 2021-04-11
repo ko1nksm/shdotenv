@@ -210,7 +210,7 @@ function parse(lines) {
       }
       if (!OVERLOAD && key in ENVIRON) continue
       ENVIRON[key] = value
-      output(export, key, value)
+      if (match(key, GREP)) output(export, key, value)
     }
   }
 }

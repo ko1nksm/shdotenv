@@ -12,7 +12,7 @@ usage() {
     "                           (posix, fish)" \
     "  -e, --env ENV_PATH     Location of the .env file [default: .env]" \
     "                           Multiple -e options are allowed" \
-    "      --overload         Overload predefined environment variables" \
+    "  -o, --overload         Overload predefined environment variables" \
     "  -n, --noexport         Do not export keys without export prefix" \
     "  -g, --grep PATTERN     Output only those that match the regexp pattern" \
     "  -k, --keyonly          Output only variable names" \
@@ -36,7 +36,7 @@ parse_options() {
         requires "$@" && shift
         _shdotenv_envfiles="$_shdotenv_envfiles \"\${$_shdotenv_pos}\""
         ;;
-      --overload) _shdotenv_overload=1 ;;
+      -o | --overload) _shdotenv_overload=1 ;;
       -n | --noexport) _shdotenv_allexport='' ;;
       -g | --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
       -k | --keyonly) _shdotenv_keyonly=1 ;;

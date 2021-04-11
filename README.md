@@ -49,7 +49,7 @@ Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]
                            (posix, fish)
   -e, --env ENV_PATH     Location of the .env file [default: .env]
                            Multiple -e options are allowed
-      --overload         Overload predefined environment variables
+  -o, --overload         Overload predefined environment variables
   -n, --noexport         Do not export keys without export prefix
   -g, --grep PATTERN     Output only those that match the regexp pattern
   -k, --keyonly          Output only variable names

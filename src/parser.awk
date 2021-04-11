@@ -140,10 +140,23 @@ function chomp(str) {
 }
 
 function output(flag, key, value) {
+  if (SHELL == "posix") output_posix(flag, key, value)
+  if (SHELL == "fish") output_fish(flag, key, value)
+}
+
+function output_posix(flag, key, value) {
   gsub("'", "'\\''", value)
   if (flag == ONLY_EXPORT) print "export " key
   if (flag == DO_EXPORT) print "export " key "='" value "'"
   if (flag == NO_EXPORT) print key "='" value "'"
+}
+
+function output_fish(flag, key, value) {
+  gsub("\\\\", "\\\\", value)
+  gsub("'", "\\'", value)
+  if (flag == ONLY_EXPORT) print "set --export " key " \"$" key "\""
+  if (flag == DO_EXPORT) print "set --export " key " '" value "'"
+  if (flag == NO_EXPORT) print "set " key " '" value "'"
 }
 
 function parse(lines) {
@@ -219,6 +232,11 @@ BEGIN {
   ESCAPE["r"] = "\r"
   ESCAPE["t"] = "\t"
   ESCAPE["v"] = "\v"
+
+  if (SHELL == "") SHELL = "posix"
+  if (!match(SHELL, "^(posix|fish)$")) {
+    abort("unsupported shell format: " SHELL)
+  }
 
   if (ARGC == 1) {
     ARGV[1] = "/dev/stdin"

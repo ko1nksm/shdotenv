@@ -7,6 +7,7 @@ version() { echo 0.4.0; }
 usage() {
   printf '%s\n' "Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]" "" \
     "  -d, --dialect     Specify the .env dialect [default: posix]" \
+    "                      (posix, ruby, node, python, php, go, docker)" \
     "  -e, --env         Location of the .env file [default: .env]" \
     "                    Multiple -e options are allowed" \
     "      --overload    Overload predefined environment variables" \

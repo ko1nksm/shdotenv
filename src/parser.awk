@@ -27,12 +27,15 @@ function parse_key(key) {
   return key
 }
 
-function parse_key_only(key) {
-  sub("[ \t]#.*", "", key)
-  if (!match(key, "^(" IDENTIFIER "[ \t]*)+$")) {
-    abort(sprintf("`%s': the key is not a valid identifier", key))
+function parse_key_only(str) {
+  if (!sub("^export[ \t]+", "", str)) {
+    syntax_error("not a variable definition")
   }
-  return key
+  sub("[ \t]#.*", "", str)
+  if (!match(str, "^(" IDENTIFIER "[ \t]*)+$")) {
+    abort(sprintf("`%s': the key is not a valid identifier", str))
+  }
+  return str
 }
 
 function parse_single_quoted_value(str) {
@@ -63,11 +66,11 @@ function parse_double_quoted_value(str,  variable, new) {
     if (match(variable, "^" META_CHARACTER "$")) {
       syntax_error("the following metacharacters must be escaped: $`\"\\")
     } else if (match(variable, "^" ESCAPED_CHARACTER "$")) {
-      if (dialect("posix")) variable = unescape(variable, "$`\"\\\n", TRUE)
-      if (dialect("ruby|go")) variable = unescape(variable, "nr", FALSE)
-      if (dialect("node")) variable = unescape(variable, "n", TRUE)
-      if (dialect("python")) variable = unescape(variable, "abfnrtv", TRUE)
-      if (dialect("php")) variable = unescape(variable, "fnrtv", TRUE)
+      if (dialect("posix")) variable = unescape(variable, "$`\"\\\n", KEEP)
+      if (dialect("ruby|go")) variable = unescape(variable, "nr", NO_KEEP)
+      if (dialect("node")) variable = unescape(variable, "n", KEEP)
+      if (dialect("python")) variable = unescape(variable, "abfnrtv", KEEP)
+      if (dialect("php")) variable = unescape(variable, "fnrtv", KEEP)
     }
 
     if (match(variable, "^\\$" IDENTIFIER "$")) {
@@ -83,6 +86,10 @@ function parse_double_quoted_value(str,  variable, new) {
     str = substr(str, pos + len)
   }
   return new str
+}
+
+function parse_raw_value(str) {
+  return str
 }
 
 function parse_unquoted_value(str) {
@@ -105,13 +112,13 @@ function remove_optional_comment(value, len,  rest) {
   return substr(value, 1, len) rest
 }
 
-function unescape(str, escape, keep,  escapes, idx) {
+function unescape(str, escape, keep_backslash,  escapes, idx) {
   split(escape, escapes, "")
   for (idx in escapes) {
     escape = escapes[idx]
     if (str == "\\" escape) return ESCAPE[escape]
   }
-  return (keep ? str : substr(str, 2))
+  return (keep_backslash ? str : substr(str, 2))
 }
 
 function unquote(str, quote) {
@@ -132,23 +139,11 @@ function chomp(str) {
   return str
 }
 
-function output_key(export, key) {
-  if (KEYONLY) {
-    print key
-  } else {
-    print (export ? "export " : "unset ") key
-  }
-}
-
-function output_key_value(export, key, value) {
-  if (KEYONLY) {
-    print key
-  } else {
-    if (!OVERLOAD && key in ENVIRON) return
-    ENVIRON[key] = value
-    gsub("'", "'\\''", value)
-    print (export ? "export " : "") key "='" value "'"
-  }
+function output(flag, key, value) {
+  gsub("'", "'\\''", value)
+  if (flag == ONLY_EXPORT) print "export " key
+  if (flag == DO_EXPORT) print "export " key "='" value "'"
+  if (flag == NO_EXPORT) print key "='" value "'"
 }
 
 function parse(lines) {
@@ -172,41 +167,45 @@ function parse(lines) {
     lines = substr(lines, RSTART + RLENGTH)
     equal_pos = index(line, "=")
     if (equal_pos == 0) {
-      if (!sub("^export[ \t]+", "", line)) {
-        syntax_error("not a variable definition")
-      }
-      output_key(DOEXPORT, parse_key_only(line))
+      key = parse_key_only(line)
     } else {
-      export = ALLEXPORT
       key = parse_key(substr(line, 1, equal_pos - 1))
+    }
+
+    if (KEYONLY) {
+      print key
+    } else if (equal_pos == 0) {
+      output(ONLY_EXPORT, key)
+    } else {
+      export = (ALLEXPORT ? DO_EXPORT : NO_EXPORT)
+      if (sub("^export[ \t]+", "", key)) export = DO_EXPORT
       value = substr(line, equal_pos + 1)
-      if (sub("^export[ \t]+", "", key)) export = DOEXPORT
 
       if (dialect("docker")) {
-        output_key_value(export, key, value)
+        value = parse_raw_value(value)
       } else if (match(value, "^"SQ_VALUE)) {
         value = remove_optional_comment(value, RLENGTH)
         value = parse_single_quoted_value(unquote(value, "'"))
-        output_key_value(export, key, value)
       } else if (match(value, "^"DQ_VALUE)) {
         value = remove_optional_comment(value, RLENGTH)
         value = parse_double_quoted_value(unquote(value, "\""))
-        output_key_value(export, key, value)
       } else {
         if (match(value, "[ \t]#")) {
           value = remove_optional_comment(value, RSTART - 1)
         }
         value = parse_unquoted_value(rtrim(value))
-        output_key_value(export, key, value)
       }
+      if (!OVERLOAD && key in ENVIRON) continue
+      ENVIRON[key] = value
+      output(export, key, value)
     }
   }
 }
 
 BEGIN {
   IDENTIFIER="[a-zA-Z_][a-zA-Z0-9_]*"
-  TRUE  = DOEXPORT = DOEXPAND = 1
-  FALSE = NOEXPORT = NOEXPAND = 0
+  KEEP = 1; NO_KEEP = 0
+  ONLY_EXPORT = 0; DO_EXPORT = 1; NO_EXPORT = 2
 
   ESCAPE["$"] = "$"
   ESCAPE["`"] = "`"

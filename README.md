@@ -92,10 +92,10 @@ dockerenv run --env-file .env -it debian
 
 ```sh
 # dotenv posix
-# This is a comment line, The above is an optional directive
+# This line is a comment, The above line is a directive
 COMMENT=The-#-sign-is-a-character # Spaces is required before the comment
 
-UNQUOTED=value1 # Spaces and these characters are not allowed: {}[]()<>"'`!$&~|;\
+UNQUOTED=value1 # Spaces and these characters are not allowed: !$&()*;<>?[\]`{|}~
 SINGLE_QUOTED='value 2' # Single quotes cannot be used as value
 DOUBLE_QUOTED="value 3" # Only these characters need to be \ escaped: $`"\
 
@@ -111,7 +111,7 @@ export EXPORT1="value"
 export EXPORT2 # Equivalent to: export EXPORT2="${EXPORT2:-}"
 ```
 
-- The first line is an optional directive which, if omitted, defaults to `posix`
+- The first line is a directive to distinguish between .env syntax dialects
 - Spaces before and after `=` are not allowed
 - Quoting is not required, but spaces and some symbols are not allowed
 - Single-quoted values cannot contains single quote in it
@@ -120,7 +120,7 @@ export EXPORT2 # Equivalent to: export EXPORT2="${EXPORT2:-}"
 - Variable expansion is only available if it is double-quoted
 - Bracing is required for variable expansion (Only `${VAR}` is supported)
 
-TODO: ~~For detailed specifications, see~~
+Detailed [POSIX-compliant .env syntax specification](docs/specification.md)
 
 ### Supported dialects
 

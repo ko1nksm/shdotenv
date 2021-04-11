@@ -240,7 +240,7 @@ echo "$LONGLINE" # => https://github.com/ko1nksm/shdotenv/blob/main/README.md
 
 ### Variable expansion is supported
 
-POSIX shell specification, but braces is required.
+POSIX shell specification.
 
 **Valid**
 
@@ -249,11 +249,15 @@ BAR="bar"
 VALUE="foo ${BAR} baz"
 ```
 
-**Invalid**
+### Braces are required for variable expansion
+
+If there are no braces, the behavior may vary depending on the shell.
 
 ```sh
 BAR="bar"
-VALUE="foo $BAR baz"
+VALUE="foo $BAR[0] baz"
+# => bash: foo bar[0] baz
+# => zsh: foo  baz
 ```
 
 ### If the variable is not set, it treats as an empty string

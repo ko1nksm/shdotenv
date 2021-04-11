@@ -4,8 +4,8 @@ dotenv support for shell and POSIX-compliant `.env` syntax specification.
 
 ## The goals of this project
 
-1. Provide a library that can safely load .env file from shell scripts
-2. Provide language-independent CLI utilities
+1. Provide language-independent CLI utilities
+2. Provide a library that can safely load .env file from shell scripts
 3. Define POSIX shell compatible .env syntax specification
 4. Support for .env syntax dialects for interoperation
 
@@ -58,17 +58,23 @@ Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]
   -h, --help             Show this message and exit
 ```
 
-### Use as library
+### Use as CLI utility
+
+Set environment variables and execute the specified command.
+
+```sh
+shdotenv [OPTION]... <COMMAND> [ARGUMENTS]...
+```
+
+### Use as shell script library
+
+Load the .env file into the shell script.
 
 ```sh
 eval "$(shdotenv [OPTION]...)"
 ```
 
-### Use as CLI utility
-
-```sh
-shdotenv [OPTION]... <COMMAND> [ARGUMENTS]...
-```
+When run on the shell, it exports the environment variables to the current shell.
 
 ### Additional CLI utility
 

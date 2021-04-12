@@ -12,6 +12,10 @@ jobs:
       - uses: actions/checkout@v2
       - run: brew upgrade
       - run: brew install shfmt shellcheck
+      - name: Install shellspec
+        run: |
+          echo "${HOME}/.local/bin" >> "$GITHUB_PATH"
+          curl -fsSL https://git.io/shellspec | sh -s master -y
       - name: Make dist archive
         run: make dist
       - name: Create release

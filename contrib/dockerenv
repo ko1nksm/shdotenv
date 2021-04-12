@@ -13,7 +13,8 @@ trap onexit EXIT
 
 load_dotenv() {
   [ "$dotenv_env_name_file" ] || dotenv_env_name_file=$(mktemp)
-  eval "$(shdotenv --env "$1" --allexport)"
+  env=$(shdotenv --env "$1")
+  eval "$env"
   shdotenv --env "$1" --keyonly >> "$dotenv_env_name_file"
   dotenv_loaded=1
 }

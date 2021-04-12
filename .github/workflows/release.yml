@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: brew upgrade
-      - run: brew install shfmt
+      - run: brew install shfmt shellcheck
       - name: Make dist archive
         run: make dist
       - name: Create release

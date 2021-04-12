@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get update
-      - run: sudo apt-get install -y dash bash busybox ksh mksh posh yash zsh gawk mawk original-awk
+      - run: sudo apt-get install -y dash bash busybox ksh mksh posh yash zsh gawk mawk original-awk shellcheck
       - name: Install shellspec
         run: |
           echo "${HOME}/.local/bin" >> "$GITHUB_PATH"

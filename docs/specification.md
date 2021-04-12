@@ -10,7 +10,7 @@ UTF-8 is already widespread and there is no need to support other encodings.
 
 ### The newline code is LF only
 
-The POSIX shells treats CR as a character.
+POSIX shells treats CR as a character.
 
 ```sh
 # when the newline code is CR LF
@@ -30,6 +30,22 @@ FOO=123
 The shell cannot handle the null (`\0`) character.
 
 ## Environment variable name
+
+### The key must be followed by `=`
+
+POSIX shell specification
+
+**Valid**
+
+```sh
+FOO=
+```
+
+**Invalid**
+
+```sh
+FOO
+```
 
 ### Spaces or tabs can be inserted before the name
 

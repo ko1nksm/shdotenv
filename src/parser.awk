@@ -54,7 +54,7 @@ function parse_double_quoted_value(str,  variable, new) {
   META_CHARACTER = "[$`\"\\\\]"
   VARIABLE_EXPANSION = "\\$[{][^}]*}"
 
-  if (dialect("ruby|node|go")) {
+  if (dialect("ruby|node|go|rust")) {
     VARIABLE_EXPANSION = "\\$" IDENTIFIER "|" VARIABLE_EXPANSION
   }
 
@@ -68,7 +68,7 @@ function parse_double_quoted_value(str,  variable, new) {
     } else if (match(variable, "^" ESCAPED_CHARACTER "$")) {
       if (dialect("posix")) variable = unescape(variable, "$`\"\\\n", KEEP)
       if (dialect("ruby|go")) variable = unescape(variable, "nr", NO_KEEP)
-      if (dialect("node")) variable = unescape(variable, "n", KEEP)
+      if (dialect("node|rust")) variable = unescape(variable, "n", KEEP)
       if (dialect("python")) variable = unescape(variable, "abfnrtv", KEEP)
       if (dialect("php")) variable = unescape(variable, "fnrtv", KEEP)
     }
@@ -247,7 +247,7 @@ BEGIN {
     lines = $0 "\n"
     if (DIALECT == "" && sub("^# dotenv ", "")) DIALECT = $0
     if (DIALECT == "") DIALECT = "posix"
-    if (!dialect("posix|docker|ruby|node|python|php|go")) {
+    if (!dialect("posix|docker|ruby|node|python|php|go|rust")) {
       abort("unsupported dotenv dialect: " DIALECT)
     }
     while (getline < ARGV[i] > 0) {

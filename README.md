@@ -44,7 +44,7 @@ $ make install PREFIX=$HOME
 Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]
 
   -d, --dialect DIALECT  Specify the .env dialect [default: posix]
-                           (posix, ruby, node, python, php, go, docker)
+                           (posix, ruby, node, python, php, go, rust, docker)
   -s, --shell SHELL      Output in the specified shell format [default: posix]
                            (posix, fish)
   -e, --env ENV_PATH     Location of the .env file [default: .env]
@@ -136,5 +136,6 @@ Reports of problems are welcome.
 - python: [python-dotenv](https://github.com/theskumar/python-dotenv)
 - php: [phpdotenv](https://github.com/vlucas/phpdotenv)
 - go: [godotenv](https://github.com/joho/godotenv)
+- rust: [dotenv](https://github.com/dotenv-rs/dotenv)
 
 [Comparing Dialects](docs/dialects.md)

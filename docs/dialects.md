@@ -9,6 +9,7 @@
 | python | 1   | 0   | 2   | 2   | 2   | 3   | 3   | 0   | -   | 3   | 1   | 0   | 2   |
 | php    | 1   | 0   | 3   | 2   | 1   | 4   | 4   | 1   | -   | 4   | 0   | 0   | 1   |
 | go     | 1   | 0   | 4   | 2   | 1   | 1   | 1   | -   | -   | 5   | 0   | 0   | 1   |
+| rust   | 1   | 0   | -   | 2   | 0   | 4   | 5   | -   | -   | 1   | 0   | 0   | 0   |
 
 The `posix` is a subset of the POSIX shell syntax.
 
@@ -38,13 +39,14 @@ The `posix` is a subset of the POSIX shell syntax.
   - 1: Need to escape when used within it: \\
   - 2: Need to escape when used within it: \$
   - 3: Need to escape when used within it: \"
-  - 4: Need to escape when used within it: \" \\
+  - 4: Need to escape when used within it: \" \\ \$
 - BE: Backslash escape (Double quoted value only)
   - 0: None
   - 1: `\n`, `\r` (Backslashes of other characters will disappear)
   - 2: `\n` (Backslashes of other characters will remain)
   - 3: `\a`,`\b`, `\f`, `\n`, `\r`, `\t`, `\v` (Backslashes of other characters will remain)
   - 4: `\f`, `\n`, `\r`, `\t`, `\v` (Backslashes of other characters will cause an error)
+  - 5: `\n` (Backslashes of other characters will cause an error)
 - ML: Multiline within quotes
   - 0: Allowed (single and double quotes)
   - 1: Allowed (double quotes only)

@@ -88,7 +88,11 @@ When run on the shell, it exports the environment variables to the current shell
 
 #### contrib/dockerenv
 
-Support `.env` syntax by `--env-file` option. It supports variable expansion and multi-line environment variables.
+The `docker` command has the `--env-file` option, but it only supports setting simple values.
+
+- [docker cannot pass newlines from variables in --env-file files](https://github.com/moby/moby/issues/12997)
+
+This tool makes the files read by `--env-file` compatible with the `.env` format, and supports variable expansion and newlines.
 
 Example: (Use `dockerenv` instead of `docker`)
 

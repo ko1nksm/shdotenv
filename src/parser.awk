@@ -10,8 +10,39 @@ function syntax_error(msg) {
   abort(sprintf("`%s': %s", CURRENT_LINE, msg))
 }
 
+function rtrim(str) {
+  sub("[ \t]+$", "", str)
+  return str
+}
+
+function chomp(str) {
+  sub("\n$", "", str)
+  return str
+}
+
 function dialect(name) {
   return index("|" name "|", "|" DIALECT "|") > 0
+}
+
+function unescape(str, escape, keep_backslash,  escapes, idx) {
+  split(escape, escapes, "")
+  for (idx in escapes) {
+    escape = escapes[idx]
+    if (str == "\\" escape) return ESCAPE[escape]
+  }
+  return (keep_backslash ? str : substr(str, 2))
+}
+
+function unquote(str, quote) {
+  if (match(str, "^" quote ".*" quote "$")) {
+    gsub("^['\"]|['\"]$", "", str)
+    return str
+  }
+  syntax_error("unterminated quoted string")
+}
+
+function expand_env(key) {
+  return (key in ENVIRON) ? ENVIRON[key] : ""
 }
 
 function parse_key(key) {
@@ -38,15 +69,26 @@ function parse_key_only(str) {
   return str
 }
 
+function parse_raw_value(str) {
+  return str
+}
+
+function parse_unquoted_value(str) {
+  if (match(str, "[ \t]")) {
+    syntax_error("spaces are not allowed without quoting")
+  }
+
+  if (match(str, "[][{}()<>\"'`!$&~|;\\\\*?]")) {
+    syntax_error("using without quotes is not allowed: !$&()*;<>?[\\]`{|}~")
+  }
+  return parse_double_quoted_value(str)
+}
+
 function parse_single_quoted_value(str) {
   if (index(str, "'")) {
     syntax_error("using single quote not allowed in the single quoted value")
   }
   return str
-}
-
-function expand_env(key) {
-  return (key in ENVIRON) ? ENVIRON[key] : ""
 }
 
 function parse_double_quoted_value(str,  variable, new) {
@@ -88,21 +130,6 @@ function parse_double_quoted_value(str,  variable, new) {
   return new str
 }
 
-function parse_raw_value(str) {
-  return str
-}
-
-function parse_unquoted_value(str) {
-  if (match(str, "[ \t]")) {
-    syntax_error("spaces are not allowed without quoting")
-  }
-
-  if (match(str, "[][{}()<>\"'`!$&~|;\\\\*?]")) {
-    syntax_error("using without quotes is not allowed: !$&()*;<>?[\\]`{|}~")
-  }
-  return parse_double_quoted_value(str)
-}
-
 function remove_optional_comment(value, len,  rest) {
   rest = substr(value, len + 1)
   if (match(rest, "^#.*")) {
@@ -110,33 +137,6 @@ function remove_optional_comment(value, len,  rest) {
   }
   sub("^([ \t]+#.*|[ \t]*)$", "", rest)
   return substr(value, 1, len) rest
-}
-
-function unescape(str, escape, keep_backslash,  escapes, idx) {
-  split(escape, escapes, "")
-  for (idx in escapes) {
-    escape = escapes[idx]
-    if (str == "\\" escape) return ESCAPE[escape]
-  }
-  return (keep_backslash ? str : substr(str, 2))
-}
-
-function unquote(str, quote) {
-  if (match(str, "^" quote ".*" quote "$")) {
-    gsub("^['\"]|['\"]$", "", str)
-    return str
-  }
-  syntax_error("unterminated quoted string")
-}
-
-function rtrim(str) {
-  sub("[ \t]+$", "", str)
-  return str
-}
-
-function chomp(str) {
-  sub("\n$", "", str)
-  return str
 }
 
 function output(flag, key, value) {

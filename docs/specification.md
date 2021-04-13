@@ -68,7 +68,7 @@ FOO   =123
 BAR=   123
 ```
 
-### The name must be AAA `[a-zA-Z_][a-zA-Z0-9_]*`
+### The name must be `[a-zA-Z_][a-zA-Z0-9_]*`
 
 POSIX shell specification.
 
@@ -92,7 +92,7 @@ export BAR # Same as `export BAR="${BAR:-}"`
 
 ## Comment
 
-### Lines beginning with # are comments
+### Lines beginning with `#` are comments
 
 POSIX shell specification.
 
@@ -216,7 +216,7 @@ VAR='foo''bar'
 
 ## Double-quoted value
 
-### Escaping is required when using " ` \ $ as a value
+### Escaping is required when using `"` <code>\`</code> `\` `$` as a value
 
 POSIX shell specification.
 

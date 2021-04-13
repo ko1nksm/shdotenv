@@ -10,8 +10,8 @@ function syntax_error(msg) {
   abort(sprintf("`%s': %s", CURRENT_LINE, msg))
 }
 
-function rtrim(str) {
-  sub("[ \t]+$", "", str)
+function trim(str) {
+  sub("(^[ \t]+)|([ \t]+$)", "", str)
   return str
 }
 
@@ -47,7 +47,7 @@ function expand_env(key) {
 
 function parse_key(key) {
   if (dialect("ruby|node|python|php|go")) {
-    key = rtrim(key)
+    key = trim(key)
   }
   if (match(key, "(^[ \t]+|[ \t]+$)")) {
     abort(sprintf("`%s': no space allowed after the key", key))
@@ -74,13 +74,18 @@ function parse_raw_value(str) {
 }
 
 function parse_unquoted_value(str) {
-  if (match(str, "[ \t]")) {
-    syntax_error("spaces are not allowed without quoting")
+  if (dialect("posix")) {
+    if (match(str, "[ \t]")) {
+      syntax_error("spaces are not allowed without quoting")
+    }
+
+    if (match(str, "[][{}()<>\"'`!$&~|;\\\\*?]")) {
+      syntax_error("using without quotes is not allowed: !$&()*;<>?[\\]`{|}~")
+    }
+  } else {
+    str = trim(str)
   }
 
-  if (match(str, "[][{}()<>\"'`!$&~|;\\\\*?]")) {
-    syntax_error("using without quotes is not allowed: !$&()*;<>?[\\]`{|}~")
-  }
   return expand_value(str, NO_QUOTES)
 }
 
@@ -109,16 +114,18 @@ function expand_value(str, quote,  variable, new) {
     len = RLENGTH
     variable = substr(str, pos, len)
 
-    if (match(variable, "^" META_CHARACTER "$")) {
-      syntax_error("the following metacharacters must be escaped: $`\"\\")
-    }
+    if (quote == DOUBLE_QUOTES) {
+      if (match(variable, "^" META_CHARACTER "$")) {
+        syntax_error("the following metacharacters must be escaped: $`\"\\")
+      }
 
-    if (match(variable, "^" ESCAPED_CHARACTER "$")) {
-      if (dialect("posix")) variable = unescape(variable, "$`\"\\\n", KEEP)
-      if (dialect("ruby|go")) variable = unescape(variable, "nr", NO_KEEP)
-      if (dialect("node|rust")) variable = unescape(variable, "n", KEEP)
-      if (dialect("python")) variable = unescape(variable, "abfnrtv", KEEP)
-      if (dialect("php")) variable = unescape(variable, "fnrtv", KEEP)
+      if (match(variable, "^" ESCAPED_CHARACTER "$")) {
+        if (dialect("posix")) variable = unescape(variable, "$`\"\\\n", KEEP)
+        if (dialect("ruby|go")) variable = unescape(variable, "nr", NO_KEEP)
+        if (dialect("node|rust")) variable = unescape(variable, "n", KEEP)
+        if (dialect("python")) variable = unescape(variable, "abfnrtv", KEEP)
+        if (dialect("php")) variable = unescape(variable, "fnrtv", KEEP)
+      }
     }
 
     if (match(variable, "^\\$" IDENTIFIER "$")) {
@@ -152,6 +159,7 @@ function output(flag, key, value) {
 
 function output_posix(flag, key, value) {
   gsub("'", "'\\''", value)
+  gsub("^''|''$", "", value)
   if (flag == ONLY_EXPORT) print "export " key
   if (flag == DO_EXPORT) print "export " key "='" value "'"
   if (flag == NO_EXPORT) print key "='" value "'"
@@ -212,7 +220,7 @@ function parse(lines) {
         if (match(value, "[ \t]#")) {
           value = remove_optional_comment(value, RSTART - 1)
         }
-        value = parse_unquoted_value(rtrim(value))
+        value = parse_unquoted_value(trim(value))
       }
       if (!OVERLOAD && key in ENVIRON) continue
       ENVIRON[key] = value

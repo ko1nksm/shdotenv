@@ -18,6 +18,23 @@ Describe "dotenv ruby parser"
     End
   End
 
+  Context "when the unquoted value is given"
+    Describe
+      Parameters
+        'FOO=value'                             "FOO='value'"
+        "FOO=value   "                          "FOO='value'"
+        'FOO=foo bar'                           "FOO='foo bar'"
+        'FOO=foo\nbar'                          "FOO='foo\nbar'"
+        'FOO=!"$%&()*+,-./:;<=>?@[\]^_`{|}~'\'  "FOO='!\"\$%&()*+,-./:;<=>?@[\]^_\`{|}~'\'"
+      End
+
+      It "parses value the \`$1'"
+        When call parse_env "$1"
+        The output should eq "$2"
+      End
+    End
+  End
+
   Context "when the double quoted value is given"
     Before "export VAR=123"
 

@@ -29,7 +29,7 @@ Quoting [bkeepers/dotenv][dotenv]:
 Download `shdotenv` (shell script) from [releases](https://github.com/ko1nksm/shdotenv/releases).
 
 ```console
-$ wget https://github.com/ko1nksm/shdotenv/releases/download/[TAG]/shdotenv -O $HOME/bin/shdotenv
+$ wget https://github.com/ko1nksm/shdotenv/releases/latest/download/shdotenv -O $HOME/bin/shdotenv
 $ chmod +x $HOME/bin/shdotenv
 ```
 

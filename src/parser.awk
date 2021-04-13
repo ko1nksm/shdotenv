@@ -81,7 +81,7 @@ function parse_unquoted_value(str) {
   if (match(str, "[][{}()<>\"'`!$&~|;\\\\*?]")) {
     syntax_error("using without quotes is not allowed: !$&()*;<>?[\\]`{|}~")
   }
-  return parse_double_quoted_value(str)
+  return expand_value(str, NO_QUOTES)
 }
 
 function parse_single_quoted_value(str) {
@@ -91,7 +91,11 @@ function parse_single_quoted_value(str) {
   return str
 }
 
-function parse_double_quoted_value(str,  variable, new) {
+function parse_double_quoted_value(str) {
+  return expand_value(str, DOUBLE_QUOTES)
+}
+
+function expand_value(str, quote,  variable, new) {
   ESCAPED_CHARACTER = "\\\\."
   META_CHARACTER = "[$`\"\\\\]"
   VARIABLE_EXPANSION = "\\$[{][^}]*}"
@@ -107,7 +111,9 @@ function parse_double_quoted_value(str,  variable, new) {
 
     if (match(variable, "^" META_CHARACTER "$")) {
       syntax_error("the following metacharacters must be escaped: $`\"\\")
-    } else if (match(variable, "^" ESCAPED_CHARACTER "$")) {
+    }
+
+    if (match(variable, "^" ESCAPED_CHARACTER "$")) {
       if (dialect("posix")) variable = unescape(variable, "$`\"\\\n", KEEP)
       if (dialect("ruby|go")) variable = unescape(variable, "nr", NO_KEEP)
       if (dialect("node|rust")) variable = unescape(variable, "n", KEEP)
@@ -219,6 +225,7 @@ BEGIN {
   IDENTIFIER="[a-zA-Z_][a-zA-Z0-9_]*"
   KEEP = 1; NO_KEEP = 0
   ONLY_EXPORT = 0; DO_EXPORT = 1; NO_EXPORT = 2
+  NO_QUOTES = 0; SINGLE_QUOTES = 1; DOUBLE_QUOTES = 2
 
   ESCAPE["$"] = "$"
   ESCAPE["`"] = "`"

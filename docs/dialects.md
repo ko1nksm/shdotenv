@@ -7,9 +7,9 @@
 | ruby   | 1   | 0   | 1   | 2   | 1   | 1   | 1   | 0   | -   | 1   | 0   | 1   | 1   |
 | node   | 1   | -   | 4   | 3   | 1   | 2   | 2   | -   | -   | 2   | 0   | 0   | -   |
 | python | 1   | 0   | 2   | 2   | 2   | 3   | 3   | 0   | -   | 3   | 1   | 0   | 2   |
-| php    | 1   | 0   | 3   | 2   | 1   | 4   | 4   | 1   | -   | 4   | 0   | 0   | 1   |
+| php    | 1   | 0   | 3   | 4   | 1   | 4   | 4   | 1   | -   | 4   | 0   | 0   | 1   |
 | go     | 1   | 0   | 4   | 2   | 1   | 1   | 1   | -   | -   | 5   | 0   | 0   | 1   |
-| rust   | 1   | 0   | -   | 2   | 0   | 4   | 5   | -   | -   | 1   | 0   | 0   | 0   |
+| rust   | 1   | 0   | -   | 4   | 0   | 4   | 5   | -   | -   | 1   | 0   | 0   | 0   |
 
 The `posix` is a subset of the POSIX shell syntax.
 
@@ -30,6 +30,7 @@ The `posix` is a subset of the POSIX shell syntax.
   - 1: Leave spaces as it is (Single and double quote values are not supported)
   - 2: Remove spaces around it
   - 3: Remove spaces around it, but leave comments as is
+  - 4: Remove spaces around it, and no spaces allowed
 - SQV: Single quoted value
   - 0: Single quotes cannot be used in it
   - 1: Single quotes can be used in it

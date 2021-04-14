@@ -108,6 +108,7 @@ if [ $(($# - _shdotenv_pos + 1)) -eq 0 ] || [ "$_shdotenv_keyonly" ]; then
   [ "$_shdotenv_quiet" ] && exec >/dev/null
   exec_awk "$@"
 else
+  _shdotenv_shell="posix"
   _shdotenv_env=$(exec_awk "$@")
   shift $((_shdotenv_pos - 1))
   set -- "$_shdotenv_env" "$@"

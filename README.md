@@ -105,11 +105,11 @@ dockerenv run --env-file .env -it debian
 ```sh
 # dotenv posix
 # This line is a comment, The above line is a directive
-COMMENT=The-#-sign-is-a-character # Spaces is required before the comment
+COMMENT=This-#-is-a-character # This is a comment
 
-UNQUOTED=value1 # Spaces and these characters are not allowed: !$&()*;<>?[\]`{|}~
-SINGLE_QUOTED='value 2' # Single quotes cannot be used as value
-DOUBLE_QUOTED="value 3" # Only these characters need to be \ escaped: $`"\
+UNQUOTED=value1 # Spaces and some special characters cannot be used
+SINGLE_QUOTED='value 2' # Cannot use single quote
+DOUBLE_QUOTED="value 3" # Some special characters need to be escaped
 
 MULTILINE="line1
 line2: \n is not a newline
@@ -117,22 +117,38 @@ line3"
 LONGLINE="https://github.com/ko1nksm\
 /shdotenv/blob/main/README.md"
 
-ENDPOINT="http://${HOST}/api"
+ENDPOINT="http://${HOST}/api" # Variable expansion requires braces
 
 export EXPORT1="value"
 export EXPORT2 # Equivalent to: export EXPORT2="${EXPORT2:-}"
 ```
 
 - The first line is a directive to distinguish between .env syntax dialects
+- Comments at the end of a line need to be preceded by spaces before the `#`
 - Spaces before and after `=` are not allowed
-- Quoting is not required, but spaces and some symbols are not allowed
+- The special characters allowed in unquoted value are `#` `%` `+` `,` `-` `.` `/` `:` `=` `@` `^` `_`
 - Single-quoted values cannot contains single quote in it
-- The following characters in double quoted values must be escaped with `\`: <code> $ ` " \ </code>
+- The characters `$` <code>\`</code> `"` `\` in the double-quoted value must be escaped with `\`
 - No support for backslash escapes except for the above (i.e., `\n` is not a newline)
-- Variable expansion is only available if it is double-quoted
+- Variable expansion is only available if it is enclosed in double quotes
 - Bracing is required for variable expansion (Only `${VAR}` is supported)
+- The `\` at the end of a line in double quoted value means line continuation
 
 Detailed [POSIX-compliant .env syntax specification](docs/specification.md)
+
+### Directive
+
+Specifies the dotenv syntanx dialect that this `.env` file.
+
+```sh
+# dotenv <DIALECT>
+```
+
+Example:
+
+```sh
+# dotenv ruby
+```
 
 ### Supported dialects
 
@@ -151,3 +167,26 @@ Reports of problems are welcome.
 - rust: [dotenv](https://github.com/dotenv-rs/dotenv)
 
 [Comparing Dialects](docs/dialects.md)
+
+## .shdotenv
+
+Specifies options for shdotenv. Currently, only `dialect` is supported.
+It is recommended that the dotenv dialect be specified with the `dotenv` directive.
+The `.shdotenv` setting is for personal use in projects where it is not allowed.
+
+```
+dialect: <DIALECT>
+```
+
+Example:
+
+```
+dialect: ruby
+```
+
+## Environment Variables
+
+| name           | description                              | default |
+| -------------- | ---------------------------------------- | ------- |
+| SHDOTENV_SHELL | Shell format to output (`posix`, `fish`) | `posix` |
+| SHDOTENV_AWK   | Path of the `awk` command                | `awk`   |

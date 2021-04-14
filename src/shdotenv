@@ -2,7 +2,7 @@
 
 set -eu
 
-version() { echo 0.6.0; }
+version() { echo 0.7.0; }
 
 usage() {
   printf '%s\n' "Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]" "" \

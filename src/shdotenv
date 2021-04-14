@@ -57,16 +57,16 @@ trim() {
 }
 
 init_vars() {
-  _shdotenv_dialect='' _shdotenv_shell='' _shdotenv_envfiles=''
-  _shdotenv_overload='' _shdotenv_allexport=1 _shdotenv_grep=''
+  _shdotenv_dialect='' _shdotenv_shell="${SHDOTENV_SHELL:-}" _shdotenv_grep=''
+  _shdotenv_envfiles='' _shdotenv_overload='' _shdotenv_allexport=1
   _shdotenv_keyonly='' _shdotenv_quiet=''
   _shdotenv_pos=1 _shdotenv_line=''
   _shdotenv_parser=$(cat src/parser.awk) # @INCLUDE-FILE
 }
 
 unset_vars() {
-  unset _shdotenv_dialect _shdotenv_shell _shdotenv_envfiles
-  unset _shdotenv_overload _shdotenv_allexport _shdotenv_grep
+  unset _shdotenv_dialect _shdotenv_shell _shdotenv_grep
+  unset _shdotenv_envfiles _shdotenv_overload _shdotenv_allexport
   unset _shdotenv_keyonly _shdotenv_quiet
   unset _shdotenv_pos _shdotenv_line _shdotenv_parser _shdotenv_env
 }

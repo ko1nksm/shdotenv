@@ -21,7 +21,7 @@ usage() {
     "  -h, --help             Show this message and exit"
 }
 
-abort() { echo "$@" >&2 && exit 1; }
+abort() { echo "shdotenv:" "$@" >&2 && exit 1; }
 requires() {
   [ $# -gt 1 ] || abort "Error: $1 option requires an argument"
   _shdotenv_pos=$((_shdotenv_pos + 1))
@@ -52,6 +52,22 @@ parse_options() {
   done
 }
 
+trim() {
+  eval "$1=\${2#\"\${2%%[!\$IFS]*}\"} && $1=\${$1%\"\${$1##*[!\$IFS]}\"}"
+}
+
+read_config_file() {
+  [ -e "$1" ] || return 0
+  while IFS= read -r _shdotenv_line || [ "$_shdotenv_line" ]; do
+    _shdotenv_line=${_shdotenv_line%%#*}
+    trim _shdotenv_line "$_shdotenv_line"
+    case $_shdotenv_line in
+      dialect:*) trim _shdotenv_dialect "${_shdotenv_line#*:}" ;;
+      *) abort "Unknown line in $1: $_shdotenv_line" ;;
+    esac
+  done <"$1"
+}
+
 exec_awk() {
   eval "set -- ${_shdotenv_envfiles:-.env}"
   set -- "$_shdotenv_parser" "$@"
@@ -70,10 +86,12 @@ eval_env() {
 
 _shdotenv_dialect='' _shdotenv_shell='' _shdotenv_envfiles='' _shdotenv_overload=''
 _shdotenv_allexport=1 _shdotenv_grep='' _shdotenv_keyonly='' _shdotenv_quiet=''
-_shdotenv_pos=1
+_shdotenv_pos=1 _shdotenv_line=''
 _shdotenv_parser=$(cat src/parser.awk) # @INCLUDE-FILE
 
 parse_options "$@"
+
+read_config_file ".shdotenv"
 
 if [ $(($# - _shdotenv_pos + 1)) -eq 0 ] || [ "$_shdotenv_keyonly" ]; then
   [ "$_shdotenv_quiet" ] && exec >/dev/null
@@ -82,7 +100,7 @@ else
   _shdotenv_env=$(exec_awk "$@")
   shift $((_shdotenv_pos - 1))
   set -- "$_shdotenv_env" "$@"
-  unset _shdotenv_pos _shdotenv_parser _shdotenv_env \
+  unset _shdotenv_pos _shdotenv_line _shdotenv_parser _shdotenv_env \
     _shdotenv_dialect _shdotenv_shell _shdotenv_envfiles _shdotenv_overload \
     _shdotenv_allexport _shdotenv_grep _shdotenv_keyonly _shdotenv_quiet
   eval_env "$1"

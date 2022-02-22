@@ -230,7 +230,7 @@ function parse(lines) {
 }
 
 BEGIN {
-  IDENTIFIER="[a-zA-Z_][a-zA-Z0-9_]*"
+  IDENTIFIER = "[a-zA-Z_][a-zA-Z0-9_]*"
   KEEP = 1; NO_KEEP = 0
   ONLY_EXPORT = 0; DO_EXPORT = 1; NO_EXPORT = 2
   NO_QUOTES = 0; SINGLE_QUOTES = 1; DOUBLE_QUOTES = 2

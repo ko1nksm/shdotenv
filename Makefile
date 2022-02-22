@@ -4,7 +4,7 @@ BINDIR := $(PREFIX)/bin
 .PHONY: build check test dist clean install uninstall
 
 build: test
-	cat ./src/LICENSE > ./shdotenv
+	cat ./src/header > ./shdotenv
 	./src/build.sh < src/shdotenv | shfmt -mn -ln posix >> ./shdotenv
 	chmod +x ./shdotenv
 

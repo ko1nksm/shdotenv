@@ -4,6 +4,7 @@ set -eu
 
 minify() {
   while IFS= read -r line; do
+    # shellcheck disable=SC2295
     line=${line#"${line%%[!$IFS]*}"}
     case $line in "#"* | "") continue ;; esac
     printf '%s\n' "$line"

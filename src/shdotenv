@@ -8,8 +8,9 @@ usage() {
   printf '%s\n' "Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]" "" \
     "  -d, --dialect DIALECT  Specify the .env dialect [default: posix]" \
     "                           (posix, ruby, node, python, php, go, rust, docker)" \
-    "  -s, --shell SHELL      Output in the specified shell format [default: posix]" \
-    "                           (posix, fish)" \
+    "  -f, --format FORMAT    Output in the specified format [default: sh]" \
+    "                           (sh, fish)" \
+    "  -s, --shell SHELL      Deprecated: Use the -f option instead" \
     "  -e, --env ENV_PATH     Location of the .env file [default: .env]" \
     "                           Multiple -e options are allowed" \
     "  -o, --overload         Overload predefined environment variables" \
@@ -31,7 +32,11 @@ parse_options() {
   while [ $# -gt 0 ]; do
     case $1 in
       -d | --dialect) requires "$@" && shift && _shdotenv_dialect="$1" ;;
-      -s | --shell) requires "$@" && shift && _shdotenv_shell="$1" ;;
+      -s | --shell) # deprecated
+        requires "$@" && shift && _shdotenv_format="$1"
+        [ "$_shdotenv_format" = "posix" ] && _shdotenv_format="sh"
+        ;;
+      -f | --format) requires "$@" && shift && _shdotenv_format="$1" ;;
       -e | --env)
         requires "$@" && shift
         _shdotenv_envfiles="$_shdotenv_envfiles \"\${$_shdotenv_pos}\""
@@ -57,15 +62,17 @@ trim() {
 }
 
 init_vars() {
-  _shdotenv_dialect='' _shdotenv_shell="${SHDOTENV_SHELL:-}" _shdotenv_grep=''
+  _shdotenv_dialect='' _shdotenv_format="${SHDOTENV_FORMAT:-}" _shdotenv_grep=''
   _shdotenv_envfiles='' _shdotenv_overload='' _shdotenv_allexport=1
   _shdotenv_keyonly='' _shdotenv_quiet=''
   _shdotenv_pos=1 _shdotenv_line=''
+  [ "$_shdotenv_format" ] || _shdotenv_format="${SHDOTENV_SHELL:-}" # deprecated
+
   _shdotenv_parser=$(cat src/parser.awk) # @INCLUDE-FILE
 }
 
 unset_vars() {
-  unset _shdotenv_dialect _shdotenv_shell _shdotenv_grep
+  unset _shdotenv_dialect _shdotenv_format _shdotenv_grep
   unset _shdotenv_envfiles _shdotenv_overload _shdotenv_allexport
   unset _shdotenv_keyonly _shdotenv_quiet
   unset _shdotenv_pos _shdotenv_line _shdotenv_parser _shdotenv_env
@@ -87,7 +94,7 @@ exec_awk() {
   eval "set -- ${_shdotenv_envfiles:-.env}"
   set -- "$_shdotenv_parser" "$@"
   [ "$_shdotenv_dialect" ] && set -- -v DIALECT="$_shdotenv_dialect" "$@"
-  [ "$_shdotenv_shell" ] && set -- -v SHELL="$_shdotenv_shell" "$@"
+  [ "$_shdotenv_format" ] && set -- -v FORMAT="$_shdotenv_format" "$@"
   [ "$_shdotenv_overload" ] && set -- -v OVERLOAD="$_shdotenv_overload" "$@"
   [ "$_shdotenv_allexport" ] && set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
   [ "$_shdotenv_grep" ] && set -- -v GREP="$_shdotenv_grep" "$@"
@@ -108,7 +115,7 @@ if [ $(($# - _shdotenv_pos + 1)) -eq 0 ] || [ "$_shdotenv_keyonly" ]; then
   [ "$_shdotenv_quiet" ] && exec >/dev/null
   exec_awk "$@"
 else
-  _shdotenv_shell="posix"
+  _shdotenv_format="sh"
   _shdotenv_env=$(exec_awk "$@")
   shift $((_shdotenv_pos - 1))
   set -- "$_shdotenv_env" "$@"

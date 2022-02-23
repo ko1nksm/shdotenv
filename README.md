@@ -53,8 +53,9 @@ Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]
 
   -d, --dialect DIALECT  Specify the .env dialect [default: posix]
                            (posix, ruby, node, python, php, go, rust, docker)
-  -s, --shell SHELL      Output in the specified shell format [default: posix]
-                           (posix, fish)
+  -f, --format FORMAT    Output in the specified format [default: sh]
+                           (sh, fish)
+  -s, --shell SHELL      Deprecated: Use the -f option instead
   -e, --env ENV_PATH     Location of the .env file [default: .env]
                            Multiple -e options are allowed
   -o, --overload         Overload predefined environment variables
@@ -186,7 +187,8 @@ dialect: ruby
 
 ## Environment Variables
 
-| name           | description                              | default |
-| -------------- | ---------------------------------------- | ------- |
-| SHDOTENV_SHELL | Shell format to output (`posix`, `fish`) | `posix` |
-| SHDOTENV_AWK   | Path of the `awk` command                | `awk`   |
+| name               | description                             | default |
+| ------------------ | --------------------------------------- | ------- |
+| SHDOTENV_FORMAT    | Output format (`sh`, `fish`)            | `sh`    |
+| ~~SHDOTENV_SHELL~~ | Deprecated: Use SHDOTENV_FORMAT instead | `posix` |
+| SHDOTENV_AWK       | Path of the `awk` command               | `awk`   |

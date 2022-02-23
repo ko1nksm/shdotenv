@@ -153,11 +153,11 @@ function remove_optional_comment(value, len,  rest) {
 }
 
 function output(flag, key, value) {
-  if (SHELL == "posix") output_posix(flag, key, value)
-  if (SHELL == "fish") output_fish(flag, key, value)
+  if (FORMAT == "sh") output_sh(flag, key, value)
+  if (FORMAT == "fish") output_fish(flag, key, value)
 }
 
-function output_posix(flag, key, value) {
+function output_sh(flag, key, value) {
   if (match(value, /'/)) {
     gsub(/[$`"\\]/, "\\\\&", value)
     value = "\"" value "\""
@@ -252,9 +252,9 @@ BEGIN {
   ESCAPE["t"] = "\t"
   ESCAPE["v"] = "\v"
 
-  if (SHELL == "") SHELL = "posix"
-  if (!match(SHELL, "^(posix|fish)$")) {
-    abort("unsupported shell format: " SHELL)
+  if (FORMAT == "") FORMAT = "sh"
+  if (!match(FORMAT, "^(sh|fish)$")) {
+    abort("unsupported format: " FORMAT)
   }
 
   if (ARGC == 1) {

@@ -5,7 +5,7 @@ set -eu
 version() { echo 0.8.0; }
 
 usage() {
-  printf '%s\n' "Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]" "" \
+  printf '%s\n' "Usage: shdotenv [OPTION]... [--] [[COMMAND | export] [ARG]...]" "" \
     "  -d, --dialect DIALECT  Specify the .env dialect [default: posix]" \
     "                           (posix, ruby, node, python, php, go, rust, docker)" \
     "  -f, --format FORMAT    Output in the specified format [default: sh]" \
@@ -19,7 +19,12 @@ usage() {
     "  -k, --keyonly          Output only variable names" \
     "  -q, --quiet            Suppress all output" \
     "  -v, --version          Show the version and exit" \
-    "  -h, --help             Show this message and exit"
+    "  -h, --help             Show this message and exit" \
+    "" \
+    "Usage: shdotenv export [-p] [--] [NAME]..." \
+    "  Exports the current environment variables in posix-compliant .env format" \
+    "" \
+    "  -p  Append \"export\" prefix"
 }
 
 abort() { echo "shdotenv:" "$@" >&2 && exit 1; }
@@ -68,7 +73,8 @@ init_vars() {
   _shdotenv_pos=1 _shdotenv_line=''
   [ "$_shdotenv_format" ] || _shdotenv_format="${SHDOTENV_SHELL:-}" # deprecated
 
-  _shdotenv_parser=$(cat src/parser.awk) # @INCLUDE-FILE
+  _shdotenv_parser=$(cat src/parser.awk)     # @INCLUDE-FILE
+  _shdotenv_exporter=$(cat src/exporter.awk) # @INCLUDE-FILE
 }
 
 unset_vars() {
@@ -90,7 +96,7 @@ read_config_file() {
   done <"$1"
 }
 
-exec_awk() {
+exec_parser() {
   eval "set -- ${_shdotenv_envfiles:-.env}"
   set -- "$_shdotenv_parser" "$@"
   [ "$_shdotenv_dialect" ] && set -- -v DIALECT="$_shdotenv_dialect" "$@"
@@ -99,6 +105,18 @@ exec_awk() {
   [ "$_shdotenv_allexport" ] && set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
   [ "$_shdotenv_grep" ] && set -- -v GREP="$_shdotenv_grep" "$@"
   [ "$_shdotenv_keyonly" ] && set -- -v KEYONLY="$_shdotenv_keyonly" "$@"
+  "${SHDOTENV_AWK:-awk}" "$@"
+}
+
+exec_exporter() {
+  set -- - "$@"
+
+  # These variables use the values of the current shell
+  #   Special environment variables in gawk
+  [ "${AWKPATH+x}" ] && set -- "AWKPATH=$AWKPATH" "$@"
+  [ "${AWKLIBPATH+x}" ] && set -- "AWKLIBPATH=$AWKLIBPATH" "$@"
+
+  set -- "$_shdotenv_exporter" "$@"
   "${SHDOTENV_AWK:-awk}" "$@"
 }
 
@@ -113,14 +131,20 @@ read_config_file ".shdotenv"
 
 if [ $(($# - _shdotenv_pos + 1)) -eq 0 ] || [ "$_shdotenv_keyonly" ]; then
   [ "$_shdotenv_quiet" ] && exec >/dev/null
-  exec_awk "$@"
+  exec_parser "$@"
 else
   _shdotenv_format="sh"
-  _shdotenv_env=$(exec_awk "$@")
+  _shdotenv_env=$(exec_parser "$@")
   shift $((_shdotenv_pos - 1))
   set -- "$_shdotenv_env" "$@"
   unset_vars
   eval_env "$1"
   shift
-  exec "$@"
+  case $1 in
+    export)
+      shift
+      exec_exporter "$@"
+      ;;
+    *) exec "$@" ;;
+  esac
 fi

@@ -272,7 +272,7 @@ BEGIN {
     while (getline < ARGV[i] > 0) {
       lines = lines $0 "\n"
     }
-    if (ARGV[i] != "/dev/stdin") close(ARGV[i])
+    if (!match(ARGV[i], "^(/dev/stdin|-)$")) close(ARGV[i])
     parse(lines)
   }
   exit

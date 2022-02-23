@@ -42,7 +42,7 @@ function unquote(str, quote) {
 }
 
 function expand_env(key) {
-  return (key in ENVIRON) ? ENVIRON[key] : ""
+  return (key in environ) ? environ[key] : ""
 }
 
 function parse_key(key) {
@@ -226,8 +226,8 @@ function parse(lines) {
         }
         value = parse_unquoted_value(trim(value))
       }
-      if (!OVERLOAD && key in ENVIRON) continue
-      ENVIRON[key] = value
+      if (!OVERLOAD && key in environ) continue
+      environ[key] = value
       if (match(key, GREP)) output(export, key, value)
     }
   }
@@ -251,6 +251,12 @@ BEGIN {
   ESCAPE["r"] = "\r"
   ESCAPE["t"] = "\t"
   ESCAPE["v"] = "\v"
+
+  if (!IGNORE) {
+    for (key in ENVIRON) {
+      environ[key] = ENVIRON[key]
+    }
+  }
 
   if (FORMAT == "") FORMAT = "sh"
   if (!match(FORMAT, "^(sh|fish)$")) {

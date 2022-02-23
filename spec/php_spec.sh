@@ -25,7 +25,7 @@ Describe "dotenv php parser"
         "FOO=value   "                          "FOO='value'"
         'FOO=foo bar'                           "FOO='foo bar'"
         'FOO=foo\nbar'                          "FOO='foo\nbar'"
-        'FOO=!"$%&()*+,-./:;<=>?@[\]^_`{|}~'\'  "FOO='!\"\$%&()*+,-./:;<=>?@[\]^_\`{|}~'\'"
+        'FOO=!"$%&()*+,-./:;<=>?@[\]^_`{|}~'\'  "FOO=\"!\\\"\\\$%&()*+,-./:;<=>?@[\\\\]^_\\\`{|}~'\""
       End
 
       It "parses value the \`$1'"

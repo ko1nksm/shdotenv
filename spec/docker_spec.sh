@@ -29,7 +29,7 @@ Describe "dotenv docker parser"
       #|line 2'
     }
     result() { %text
-      #|FOO=''\''line 1'
+      #|FOO="'line 1"
     }
     When call parse_env "$(data)"
     The status should be failure

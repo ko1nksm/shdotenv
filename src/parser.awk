@@ -158,11 +158,16 @@ function output(flag, key, value) {
 }
 
 function output_posix(flag, key, value) {
-  gsub("'", "'\\''", value)
-  gsub("^''|''$", "", value)
+  if (match(value, /'/)) {
+    gsub(/[$`"\\]/, "\\\\&", value)
+    value = "\"" value "\""
+  } else {
+    value = "'" value "'"
+  }
+
   if (flag == ONLY_EXPORT) print "export " key
-  if (flag == DO_EXPORT) print "export " key "='" value "'"
-  if (flag == NO_EXPORT) print key "='" value "'"
+  if (flag == DO_EXPORT) print "export " key "=" value
+  if (flag == NO_EXPORT) print key "=" value
 }
 
 function output_fish(flag, key, value) {

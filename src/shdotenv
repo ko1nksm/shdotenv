@@ -51,7 +51,7 @@ parse_options() {
       -o | --overload) _shdotenv_overload=1 ;;
       -n | --noexport) _shdotenv_allexport='' ;;
       -g | --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
-      -k | --keyonly) _shdotenv_keyonly=1 ;;
+      -k | --keyonly | --name-only) _shdotenv_nameonly=1 ;;
       -q | --quiet) _shdotenv_quiet=1 ;;
       -v | --version) version && exit 0 ;;
       -h | --help) usage && exit 0 ;;
@@ -71,7 +71,7 @@ trim() {
 init_vars() {
   _shdotenv_dialect='' _shdotenv_format="${SHDOTENV_FORMAT:-}" _shdotenv_grep=''
   _shdotenv_envfiles='' _shdotenv_overload='' _shdotenv_allexport=1
-  _shdotenv_keyonly='' _shdotenv_quiet='' _shdotenv_ignore=''
+  _shdotenv_nameonly='' _shdotenv_quiet='' _shdotenv_ignore=''
   _shdotenv_pos=1 _shdotenv_line=''
   [ "$_shdotenv_format" ] || _shdotenv_format="${SHDOTENV_SHELL:-}" # deprecated
 
@@ -82,7 +82,7 @@ init_vars() {
 unset_vars() {
   unset _shdotenv_dialect _shdotenv_format _shdotenv_grep
   unset _shdotenv_envfiles _shdotenv_overload _shdotenv_allexport
-  unset _shdotenv_keyonly _shdotenv_quiet _shdotenv_ignore
+  unset _shdotenv_nameonly _shdotenv_quiet _shdotenv_ignore
   unset _shdotenv_pos _shdotenv_line _shdotenv_parser _shdotenv_env
 }
 
@@ -106,7 +106,7 @@ exec_parser() {
   [ "$_shdotenv_overload" ] && set -- -v OVERLOAD="$_shdotenv_overload" "$@"
   [ "$_shdotenv_allexport" ] && set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
   [ "$_shdotenv_grep" ] && set -- -v GREP="$_shdotenv_grep" "$@"
-  [ "$_shdotenv_keyonly" ] && set -- -v KEYONLY="$_shdotenv_keyonly" "$@"
+  [ "$_shdotenv_nameonly" ] && set -- -v NAMEONLY="$_shdotenv_nameonly" "$@"
   [ "$_shdotenv_ignore" ] && set -- -v IGNORE="$_shdotenv_ignore" "$@"
   "${SHDOTENV_AWK:-awk}" "$@"
 }
@@ -132,7 +132,7 @@ parse_options "$@"
 
 read_config_file ".shdotenv"
 
-if [ $(($# - _shdotenv_pos + 1)) -eq 0 ] || [ "$_shdotenv_keyonly" ]; then
+if [ $(($# - _shdotenv_pos + 1)) -eq 0 ] || [ "$_shdotenv_nameonly" ]; then
   [ "$_shdotenv_quiet" ] && exec >/dev/null
   exec_parser "$@"
 else

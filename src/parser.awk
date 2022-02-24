@@ -203,8 +203,10 @@ function parse(lines) {
       key = parse_key(substr(line, 1, equal_pos - 1))
     }
 
-    if (KEYONLY) {
+    if (NAMEONLY) {
+      if (!OVERLOAD && key in environ) continue
       print key
+      environ[key] = ""
     } else if (equal_pos == 0) {
       output(ONLY_EXPORT, key)
     } else {

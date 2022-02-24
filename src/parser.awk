@@ -172,9 +172,9 @@ function output_sh(flag, key, value) {
 
 function output_fish(flag, key, value) {
   gsub(/[\\']/, "\\\\&", value)
-  if (flag == ONLY_EXPORT) print "set --export " key " \"$" key "\""
-  if (flag == DO_EXPORT) print "set --export " key " '" value "'"
-  if (flag == NO_EXPORT) print "set " key " '" value "'"
+  if (flag == ONLY_EXPORT) print "set --export " key " \"$" key "\";"
+  if (flag == DO_EXPORT) print "set --export " key " '" value "';"
+  if (flag == NO_EXPORT) print "set " key " '" value "';"
 }
 
 function parse(lines) {

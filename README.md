@@ -1,6 +1,6 @@
 # shdotenv
 
-dotenv support for shell and POSIX-compliant `.env` syntax specification.
+dotenv for shells with support for POSIX-compliant and multiple .env file syntax
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ko1nksm/shdotenv/macOS?logo=github)
 
@@ -10,12 +10,20 @@ Quoting [bkeepers/dotenv][dotenv]:
 
 [dotenv]: https://github.com/bkeepers/dotenv
 
+## Why not use `source` or `export`?
+
+It is not safe. If you load a .env file syntax that is incompatible with the POSIX shell syntax, you will get unexpected results and may even result in the execution of scripts.
+
+There is no formal specification for the .env file syntax, and different languages, libraries, and tools use different syntaxes.
+
+shdotenv safely loads the syntax of .env files that are compatible with POSIX shell syntax.And also, for interoperability, .env files with other syntaxes are supported whenever possible.
+
 ## The goals of this project
 
 1. Provide language-independent CLI utilities
 2. Provide a library that can safely load .env file from shell scripts
-3. Define POSIX shell compatible .env syntax specification
-4. Support for .env syntax dialects for interoperation
+3. Define POSIX shell compatible .env file syntax specification
+4. Support for .env file syntax dialects for interoperation
 
 ## Requirements
 
@@ -44,30 +52,53 @@ $ make
 $ make install PREFIX=$HOME
 ```
 
+## Usage
+
+```
+Usage: shdotenv [OPTION]... [--] [[COMMAND | export] [ARG]...]
+
+  If the COMMAND is specified, it will load .env files and run the command.
+  If the COMMAND is omitted, it will output the result of interpreting .env
+  files. It can be safely loaded into the shell (For example, using eval).
+
+Options:
+  -d, --dialect DIALECT     Specify the .env dialect [default: posix]
+                                posix, ruby, node, python,
+                                php, go, rust, docker
+  -f, --format FORMAT       Output in the specified format [default: sh]
+                                sh, fish
+  -e, --env ENV_PATH        Location of the .env file [default: .env]
+                              Multiple -e options are allowed
+                              If the ENV_PATH is "-", read from stdin
+  -i, --ignore-environment  Ignore the current environment variables
+      --overload            Overload predefined environment variables
+      --noexport            Do not append "export" prefix
+      --grep PATTERN        Output only names that match the regexp pattern
+      --name-only           Output only environment variable names
+  -q, --quiet               Suppress all output (useful for test .env files)
+  -v, --version             Show the version and exit
+  -h, --help                Show this message and exit
+
+  Deprecated: (to be removed in the next version)
+  -s, --shell SHELL         Use the -f (--format) option instead
+  -k, --keyonly             Use the --name-only option instead
+  -o, -n, -g                Use long options instead
+
+Usage: shdotenv export [-n | -p] [--] [NAME]...
+  Exports environment variables in posix-compliant .env format.
+
+  -n  List only environment variable names
+  -p  Append "export" prefix to environment variable names
+
+  This will be output after the .env files is loaded. If you do not want
+  to load it, specify "-e /dev/null". This is similar to "export", "env"
+  and "printenv" commands, but quoting correctly and exports only portable
+  environment variable name that are valid as identifier for posix shell.
+```
+
 ## How to use
 
-### Usage
-
-```
-Usage: shdotenv [OPTION]... [--] [COMMAND [ARG]...]
-
-  -d, --dialect DIALECT  Specify the .env dialect [default: posix]
-                           (posix, ruby, node, python, php, go, rust, docker)
-  -f, --format FORMAT    Output in the specified format [default: sh]
-                           (sh, fish)
-  -s, --shell SHELL      Deprecated: Use the -f option instead
-  -e, --env ENV_PATH     Location of the .env file [default: .env]
-                           Multiple -e options are allowed
-  -o, --overload         Overload predefined environment variables
-  -n, --noexport         Do not export keys without export prefix
-  -g, --grep PATTERN     Output only those that match the regexp pattern
-  -k, --keyonly          Output only variable names
-  -q, --quiet            Suppress all output
-  -v, --version          Show the version and exit
-  -h, --help             Show this message and exit
-```
-
-### Use as CLI utility
+### Use as a CLI utility
 
 Set environment variables and execute the specified command.
 
@@ -75,15 +106,33 @@ Set environment variables and execute the specified command.
 shdotenv [OPTION]... <COMMAND> [ARGUMENTS]...
 ```
 
-### Use as shell script library
+### Use as a library
 
-Load the .env file into the shell script.
+Load the .env file into the shell script. When run on the shell, it exports to the current shell.
 
 ```sh
 eval "$(shdotenv [OPTION]...)"
 ```
 
-When run on the shell, it exports the environment variables to the current shell.
+fish shell is also supported.
+
+```fish
+eval (shdotenv -f fish [OPTION]...)
+```
+
+### Test the .env file syntax
+
+```sh
+shdotenv --quiet --env .env
+```
+
+### Export environment variables safely
+
+This is similar to `export`, `env` and `printenv` commands, but quoting correctly and exports only portable environment variable name that are valid as identifier for POSIX shell.
+
+```text
+shdotenv export [-n | -p] [NAME]...
+```
 
 ### Additional CLI utility
 
@@ -124,16 +173,22 @@ export EXPORT1="value"
 export EXPORT2 # Equivalent to: export EXPORT2="${EXPORT2:-}"
 ```
 
-- The first line is a directive to distinguish between .env syntax dialects
+- The syntax is a subset of the POSIX shell.
+- The first line is an optional directive that specifies the dialect of the .env syntax
+- No spaces are allowed before or after the `=` separating the name and value
+- ANSI-C style escapes are not available (i.e., `\n` is not a newline)
+- **Unquoted value**
+  - The special characters that can be used are `#` `%` `+` `,` `-` `.` `/` `:` `=` `@` `^` `_`
+- **Single-quoted value**
+  - The disallowed character is: `'`
+  - It can contain newline characters.
+- **Double-quoted value**
+  - Variable expansion is available (only `${VAR}` style is supported)
+  - The following values should be escaped with a backslash (`\`): `$` <code>\`</code> `"` `\`
+  - The `\` at the end of a line value means line continuation
+  - It can contain newline characters.
+- An optional `export` prefix can be added to the name
 - Comments at the end of a line need to be preceded by spaces before the `#`
-- Spaces before and after `=` are not allowed
-- The special characters allowed in unquoted value are `#` `%` `+` `,` `-` `.` `/` `:` `=` `@` `^` `_`
-- Single-quoted values cannot contains single quote in it
-- The characters `$` <code>\`</code> `"` `\` in the double-quoted value must be escaped with `\`
-- No support for backslash escapes except for the above (i.e., `\n` is not a newline)
-- Variable expansion is only available if it is enclosed in double quotes
-- Bracing is required for variable expansion (Only `${VAR}` is supported)
-- The `\` at the end of a line in double quoted value means line continuation
 
 Detailed [POSIX-compliant .env syntax specification](docs/specification.md)
 
@@ -153,11 +208,7 @@ Example:
 
 ### Supported dialects
 
-The formal `.env` syntax for this project is `posix` only.
-The `posix` is a subset of the POSIX shell and is compatible with shell scripts.
-Support for other .env syntax dialects is for interoperability purposes.
-Compatibility will be improved gradually, but is not fully compatible.
-Reports of problems are welcome.
+The formal `.env` syntax for this project is `posix` only. The `posix` is a subset of the POSIX shell and is compatible with shell scripts. Support for other .env syntax dialects is for interoperability purposes. Compatibility will be improved gradually, but is not fully compatible. Reports of problems are welcome.
 
 - docker: [docker](https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file)
 - ruby: [dotenv](https://github.com/bkeepers/dotenv)
@@ -171,9 +222,7 @@ Reports of problems are welcome.
 
 ## .shdotenv
 
-Specifies options for shdotenv. Currently, only `dialect` is supported.
-It is recommended that the dotenv dialect be specified with the `dotenv` directive.
-The `.shdotenv` setting is for personal use in projects where it is not allowed.
+Specifies options for shdotenv. Currently, only `dialect` is supported. It is recommended that the dotenv dialect be specified with the `dotenv` directive. The `.shdotenv` setting is for personal use in projects where it is not allowed.
 
 ```
 dialect: <DIALECT>

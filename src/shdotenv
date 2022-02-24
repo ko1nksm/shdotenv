@@ -165,6 +165,6 @@ else
       shift
       exec_exporter "$@"
       ;;
-    *) exec "$@" ;;
+    *) exec env "$@" ;;
   esac
 fi

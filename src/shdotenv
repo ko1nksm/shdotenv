@@ -86,22 +86,28 @@ trim() {
   eval "$1=\${2#\"\${2%%[!\$IFS]*}\"} && $1=\${$1%\"\${$1##*[!\$IFS]}\"}"
 }
 
+unexport() {
+  set -- "$@" "$*"
+  while [ $# -gt 1 ]; do
+    unset "${1%%=*}"
+    shift
+  done
+  eval "$*"
+}
+
 init_vars() {
-  _shdotenv_dialect='' _shdotenv_format="${SHDOTENV_FORMAT:-}" _shdotenv_grep=''
-  _shdotenv_envfiles='' _shdotenv_overload='' _shdotenv_allexport=1
-  _shdotenv_nameonly='' _shdotenv_quiet='' _shdotenv_ignore=''
-  _shdotenv_pos=1 _shdotenv_line=''
+  set --
+  set -- "$@" _shdotenv_dialect= _shdotenv_format= _shdotenv_grep=
+  set -- "$@" _shdotenv_envfiles= _shdotenv_overload= _shdotenv_allexport=1
+  set -- "$@" _shdotenv_nameonly= _shdotenv_quiet= _shdotenv_ignore=
+  set -- "$@" _shdotenv_pos=1 _shdotenv_line=
+  unexport "$@"
+
+  _shdotenv_format="${SHDOTENV_FORMAT:-}"
   [ "$_shdotenv_format" ] || _shdotenv_format="${SHDOTENV_SHELL:-}" # deprecated
 
   _shdotenv_parser=$(cat src/parser.awk)     # @INCLUDE-FILE
   _shdotenv_exporter=$(cat src/exporter.awk) # @INCLUDE-FILE
-}
-
-unset_vars() {
-  unset _shdotenv_dialect _shdotenv_format _shdotenv_grep
-  unset _shdotenv_envfiles _shdotenv_overload _shdotenv_allexport
-  unset _shdotenv_nameonly _shdotenv_quiet _shdotenv_ignore
-  unset _shdotenv_pos _shdotenv_line _shdotenv_parser _shdotenv_env
 }
 
 read_config_file() {
@@ -141,10 +147,6 @@ exec_exporter() {
   "${SHDOTENV_AWK:-awk}" "$@"
 }
 
-eval_env() {
-  eval "set --; $1"
-}
-
 init_vars
 parse_options "$@"
 
@@ -157,10 +159,7 @@ else
   _shdotenv_format="sh"
   _shdotenv_env=$(exec_parser "$@")
   shift $((_shdotenv_pos - 1))
-  set -- "$_shdotenv_env" "$@"
-  unset_vars
-  eval_env "$1"
-  shift
+  eval "$_shdotenv_env"
   case $1 in
     export)
       shift

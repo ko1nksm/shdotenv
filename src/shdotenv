@@ -2,6 +2,9 @@
 
 set -eu
 
+# Explicitly reset the IFS for the old dash (ash)
+IFS=$(printf '\n\t') && IFS=" ${IFS#?}${IFS%?}"
+
 version() { echo 0.8.0; }
 
 usage() {

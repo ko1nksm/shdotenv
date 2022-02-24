@@ -1,3 +1,5 @@
+#!/usr/bin/awk -f
+
 function abort(msg) {
   print msg > "/dev/stderr"
   exit 1

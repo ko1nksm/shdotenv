@@ -5,27 +5,44 @@ set -eu
 version() { echo 0.8.0; }
 
 usage() {
-  printf '%s\n' "Usage: shdotenv [OPTION]... [--] [[COMMAND | export] [ARG]...]" "" \
+  printf '%s\n' "Usage: shdotenv [OPTION]... [--] [[COMMAND | export] [ARG]...]" \
+    "" \
+    "  If the COMMAND is specified, it will load .env files and run the command." \
+    "  If the COMMAND is omitted, it will output the result of interpreting .env" \
+    "  files. It can be safely loaded into the shell (For example, using eval)." \
+    "" \
+    "Options:" \
     "  -d, --dialect DIALECT     Specify the .env dialect [default: posix]" \
-    "                              posix, ruby, node, python, php, go, rust, docker" \
+    "                                posix, ruby, node, python," \
+    "                                php, go, rust, docker" \
     "  -f, --format FORMAT       Output in the specified format [default: sh]" \
-    "                              sh, fish" \
-    "  -s, --shell SHELL         Deprecated: Use the -f option instead" \
+    "                                sh, fish" \
     "  -e, --env ENV_PATH        Location of the .env file [default: .env]" \
     "                              Multiple -e options are allowed" \
-    "  -i, --ignore-environment  Start with an empty environment" \
-    "  -o, --overload            Overload predefined environment variables" \
-    "  -n, --noexport            Do not export keys without export prefix" \
-    "  -g, --grep PATTERN        Output only those that match the regexp pattern" \
-    "  -k, --keyonly             Output only variable names" \
-    "  -q, --quiet               Suppress all output" \
+    "                              If the ENV_PATH is \"-\", read from stdin" \
+    "  -i, --ignore-environment  Ignore the current environment variables" \
+    "      --overload            Overload predefined environment variables" \
+    "      --noexport            Do not append \"export\" prefix" \
+    "      --grep PATTERN        Output only names that match the regexp pattern" \
+    "      --name-only           Output only environment variable names" \
+    "  -q, --quiet               Suppress all output (useful for test .env files)" \
     "  -v, --version             Show the version and exit" \
     "  -h, --help                Show this message and exit" \
     "" \
-    "Usage: shdotenv export [-p] [--] [NAME]..." \
-    "  Exports the current environment variables in posix-compliant .env format" \
+    "  Deprecated: (to be removed in the next version)" \
+    "  -s, --shell SHELL         Use the -f (--format) option instead" \
+    "  -k, --keyonly             Use the --name-only option instead" \
+    "  -o, -n, -g                Use long options instead" \
     "" \
-    "  -p  Append \"export\" prefix"
+    "Usage: shdotenv export [-p] [--] [NAME]..." \
+    "  Exports environment variables in posix-compliant .env format." \
+    "" \
+    "  -p  Append \"export\" prefix" \
+    "" \
+    "  This will be output after the .env files is loaded. If you do not want" \
+    "  to load it, specify \"-e /dev/null\". This is similar to \"export\", \"env\"" \
+    "  and \"printenv\" commands, but quoting correctly and exports only portable" \
+    "  environment variable name that are valid as identifier for posix shell."
 }
 
 abort() { echo "shdotenv:" "$@" >&2 && exit 1; }

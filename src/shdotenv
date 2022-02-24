@@ -34,10 +34,11 @@ usage() {
     "  -k, --keyonly             Use the --name-only option instead" \
     "  -o, -n, -g                Use long options instead" \
     "" \
-    "Usage: shdotenv export [-p] [--] [NAME]..." \
+    "Usage: shdotenv export [-n | -p] [--] [NAME]..." \
     "  Exports environment variables in posix-compliant .env format." \
     "" \
-    "  -p  Append \"export\" prefix" \
+    "  -n  List only environment variable names" \
+    "  -p  Append \"export\" prefix to environment variable names" \
     "" \
     "  This will be output after the .env files is loaded. If you do not want" \
     "  to load it, specify \"-e /dev/null\". This is similar to \"export\", \"env\"" \

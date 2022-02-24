@@ -29,7 +29,7 @@ function sort(ary,  len, min, tmp, i, j) {
 
 BEGIN {
   ex = envkeys_length = 0
-  prefix = ""
+  prefix = nameonly = ""
 
   for (key in ENVIRON) {
     if (!match(key, "^[a-zA-Z_][a-zA-Z0-9_]*$")) continue
@@ -54,6 +54,8 @@ BEGIN {
   for (; i < ARGC; i++) {
     if (ARGV[i] == "-p") {
       prefix = "export "
+    } else if (ARGV[i] == "-n") {
+      nameonly = 1
     } else if (ARGV[i] == "--") {
       i++
       break
@@ -75,7 +77,11 @@ BEGIN {
 
   for (i = 0; i < envkeys_length; i++ ) {
     if (envkeys[i] in environ) {
-      printf prefix "%s=%s\n", envkeys[i], quotes(environ[envkeys[i]])
+      if (nameonly) {
+        printf prefix "%s\n", envkeys[i]
+      } else {
+        printf prefix "%s=%s\n", envkeys[i], quotes(environ[envkeys[i]])
+      }
     } else {
       ex = 1
     }

@@ -32,11 +32,6 @@ usage() {
     "  -v, --version             Show the version and exit" \
     "  -h, --help                Show this message and exit" \
     "" \
-    "  Deprecated: (to be removed in the next version)" \
-    "  -s, --shell SHELL         Use the -f (--format) option instead" \
-    "  -k, --keyonly             Use the --name-only option instead" \
-    "  -o, -n, -g                Use long options instead" \
-    "" \
     "Usage: shdotenv export [-n | -p] [--] [NAME]..." \
     "  Exports environment variables in posix-compliant .env format." \
     "" \
@@ -59,20 +54,16 @@ parse_options() {
   while [ $# -gt 0 ]; do
     case $1 in
       -d | --dialect) requires "$@" && shift && _shdotenv_dialect="$1" ;;
-      -s | --shell) # deprecated
-        requires "$@" && shift && _shdotenv_format="$1"
-        [ "$_shdotenv_format" = "posix" ] && _shdotenv_format="sh"
-        ;;
       -f | --format) requires "$@" && shift && _shdotenv_format="$1" ;;
       -e | --env)
         requires "$@" && shift
         _shdotenv_envfiles="$_shdotenv_envfiles \"\${$_shdotenv_pos}\""
         ;;
       -i | --ignore-environment) _shdotenv_ignore=1 ;;
-      -o | --overload) _shdotenv_overload=1 ;;
-      -n | --noexport) _shdotenv_allexport='' ;;
-      -g | --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
-      -k | --keyonly | --name-only) _shdotenv_nameonly=1 ;;
+      --overload) _shdotenv_overload=1 ;;
+      --noexport) _shdotenv_allexport='' ;;
+      --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
+      --name-only) _shdotenv_nameonly=1 ;;
       -q | --quiet) _shdotenv_quiet=1 ;;
       -v | --version) version && exit 0 ;;
       -h | --help) usage && exit 0 ;;
@@ -107,8 +98,6 @@ init_vars() {
   unexport "$@"
 
   _shdotenv_format="${SHDOTENV_FORMAT:-}"
-  [ "$_shdotenv_format" ] || _shdotenv_format="${SHDOTENV_SHELL:-}" # deprecated
-
   _shdotenv_parser=$(cat src/parser.awk)     # @INCLUDE-FILE
   _shdotenv_exporter=$(cat src/exporter.awk) # @INCLUDE-FILE
 }

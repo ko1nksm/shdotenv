@@ -4,6 +4,8 @@ dotenv for shells with support for POSIX-compliant and multiple .env file syntax
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ko1nksm/shdotenv/macOS?logo=github)
 
+**Project Status**: Almost complete. Major features have been implemented, and v1.0.0 will be released after deprecated features are removed.
+
 Quoting [bkeepers/dotenv][dotenv]:
 
 > Storing [configuration in the environment](http://12factor.net/config) is one of the tenets of a [twelve-factor app](http://12factor.net). Anything that is likely to change between deployment environments–such as resource handles for databases or credentials for external services–should be extracted from the code into environment variables.
@@ -12,11 +14,9 @@ Quoting [bkeepers/dotenv][dotenv]:
 
 ## Why not use `source` or `export`?
 
-It is not safe. If you load a .env file syntax that is incompatible with the POSIX shell syntax, you will get unexpected results and may even result in the execution of scripts.
+It is not safe. There is no formal specification for the .env file syntax, and different languages, libraries, and tools use different syntaxes. If you load a .env file syntax that is incompatible with the POSIX shell syntax, you will get unexpected results and may even result in the execution of scripts.
 
-There is no formal specification for the .env file syntax, and different languages, libraries, and tools use different syntaxes.
-
-shdotenv safely loads the syntax of .env files that are compatible with POSIX shell syntax.And also, for interoperability, .env files with other syntaxes are supported whenever possible.
+shdotenv safely loads the syntax of .env files that are compatible with POSIX shell syntax. There is no possibility that the script will be executed. And also, for interoperability, .env files with other syntaxes are supported whenever possible.
 
 ## The goals of this project
 
@@ -27,10 +27,11 @@ shdotenv safely loads the syntax of .env files that are compatible with POSIX sh
 
 ## Requirements
 
-`shdotenv` is a single file shell script with embedded awk script.
+`shdotenv` is a single file shell script with embedded awk script. It uses only the following commands which can be found anywhere.
 
 - POSIX shell (dash, bash, ksh, zsh, etc)
 - awk (gawk, nawk, mawk, busybox awk)
+- `env` command
 
 ## Install
 

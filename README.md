@@ -53,6 +53,8 @@ $ make
 $ make install PREFIX=$HOME
 ```
 
+**Note for developers**: `shdotenv` can be run in source code without building. Please run `src/shdotenv`.
+
 ## Usage
 
 ```

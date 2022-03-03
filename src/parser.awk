@@ -11,7 +11,12 @@ function syntax_error(msg) {
 }
 
 function trim(str) {
-  sub("(^[ \t]+)|([ \t]+$)", "", str)
+  gsub("(^[ \t]+)|([ \t]+$)", "", str)
+  return str
+}
+
+function rtrim(str) {
+  sub("[ \t]+$", "", str)
   return str
 }
 
@@ -226,7 +231,12 @@ function parse(lines) {
         if (match(value, "[ \t]#")) {
           value = remove_optional_comment(value, RSTART - 1)
         }
-        value = parse_unquoted_value(trim(value))
+        if (dialect("posix")) {
+          value = rtrim(value)
+        } else {
+          value = trim(value)
+        }
+        value = parse_unquoted_value(value)
       }
       if (!OVERLOAD && key in environ) continue
       environ[key] = value

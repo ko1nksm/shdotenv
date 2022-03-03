@@ -74,6 +74,7 @@ Describe "dotenv posix parser"
       Parameters
         'FOO'             "\`FOO': not a variable definition"
         'FOO =value'      "\`FOO ': no space allowed after the key"
+        'FOO= value'      "\`FOO= value': spaces are not allowed without quoting"
         'FOO.BAR=value'   "\`FOO.BAR': the key is not a valid identifier"
         '0FOO=value'      "\`0FOO': the key is not a valid identifier"
         'export FOO.BAR'  "\`FOO.BAR': the key is not a valid identifier"

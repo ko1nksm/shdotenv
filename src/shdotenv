@@ -5,7 +5,7 @@ set -eu
 # Explicitly reset the IFS for the old dash (ash)
 IFS=$(printf '\n\t') && IFS=" ${IFS#?}${IFS%?}"
 
-version() { echo 0.9.0; }
+version() { echo 0.10.0-dev; }
 
 usage() {
   printf '%s\n' "Usage: shdotenv [OPTION]... [--] [[COMMAND | export] [ARG]...]" \
@@ -19,7 +19,7 @@ usage() {
     "                                posix, ruby, node, python," \
     "                                php, go, rust, docker" \
     "  -f, --format FORMAT       Output in the specified format [default: sh]" \
-    "                                sh, fish" \
+    "                                sh, csh, fish" \
     "  -e, --env ENV_PATH        Location of the .env file [default: .env]" \
     "                              Multiple -e options are allowed" \
     "                              If the ENV_PATH is \"-\", read from stdin" \

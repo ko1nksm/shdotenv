@@ -159,6 +159,7 @@ function remove_optional_comment(value, len,  rest) {
 
 function output(flag, key, value) {
   if (FORMAT == "sh") output_sh(flag, key, value)
+  if (FORMAT == "csh") output_csh(flag, key, value)
   if (FORMAT == "fish") output_fish(flag, key, value)
 }
 
@@ -173,6 +174,20 @@ function output_sh(flag, key, value) {
   if (flag == ONLY_EXPORT) print "export " key
   if (flag == DO_EXPORT) print "export " key "=" value
   if (flag == NO_EXPORT) print key "=" value
+}
+
+function output_csh(flag, key, value) {
+  if (match(value, /['\n]/)) {
+    gsub(/[$`"\\]/, "\"'&'\"", value)
+    gsub(/[\n]/, "${newline:q}", value)
+    value = "\"" value "\""
+  } else {
+    value = "'" value "'"
+  }
+
+  if (flag == ONLY_EXPORT) print "setenv " key ";"
+  if (flag == DO_EXPORT) print "setenv " key " " value ";"
+  if (flag == NO_EXPORT) print "set " key "=" value ";"
 }
 
 function output_fish(flag, key, value) {
@@ -271,7 +286,7 @@ BEGIN {
   }
 
   if (FORMAT == "") FORMAT = "sh"
-  if (!match(FORMAT, "^(sh|fish)$")) {
+  if (!match(FORMAT, "^(sh|csh|fish)$")) {
     abort("unsupported format: " FORMAT)
   }
 

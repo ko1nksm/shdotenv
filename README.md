@@ -108,11 +108,21 @@ shdotenv [OPTION]... <COMMAND> [ARGUMENTS]...
 
 Load the .env file into the shell script. When run on the shell, it exports to the current shell.
 
+### sh, bash, ksh, zsh, etc. (POSIX-compliant shells)
+
 ```sh
 eval "$(shdotenv [OPTION]...)"
 ```
 
-fish shell is also supported.
+### csh, tcsh
+
+```tcsh
+set newline='\
+'
+eval "`shdotenv -f csh [OPTION]...`"
+```
+
+### fish
 
 ```fish
 eval (shdotenv -f fish [OPTION]...)

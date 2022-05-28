@@ -27,11 +27,27 @@ Describe "formatter"
       "FOO=\"a'b\""               "set FOO 'a\'b';"
       "FOO='a${LF}b'"             "set FOO 'a${LF}b';"
       'export FOO'                'set --export FOO "$FOO";'
-      'export FOO BAR'            'set --export FOO BAR "$FOO BAR";'
+      'export FOO=BAR'            "set --export FOO 'BAR';"
     End
 
     It "parses value the \`$1'"
       When call format_as fish "$1"
+      The output should eq "$2"
+    End
+  End
+
+  Describe "csh"
+    Parameters
+      'FOO=bar'                   "set FOO='bar';"
+      "FOO='a\"b'"                "set FOO='a\"b';"
+      "FOO=\"a'b\""               "set FOO=\"a'b\";"
+      "FOO='a${LF}b'"             "set FOO=\"a\${newline:q}b\";"
+      'export FOO'                'setenv FOO;'
+      'export FOO=BAR'            "setenv FOO 'BAR';"
+    End
+
+    It "parses value the \`$1'"
+      When call format_as csh "$1"
       The output should eq "$2"
     End
   End

@@ -4,7 +4,7 @@ dotenv for shells with support for POSIX-compliant and multiple .env file syntax
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ko1nksm/shdotenv/macOS?logo=github)
 
-**Project Status**: Almost complete. Major features have been implemented, and v1.0.0 will be released after deprecated features are removed.
+**Project Status**: Almost complete. Major features have been implemented and v1.0.0 will be released in the near future.
 
 Quoting [bkeepers/dotenv][dotenv]:
 
@@ -81,11 +81,6 @@ Options:
   -q, --quiet               Suppress all output (useful for test .env files)
   -v, --version             Show the version and exit
   -h, --help                Show this message and exit
-
-  Deprecated: (to be removed in the next version)
-  -s, --shell SHELL         Use the -f (--format) option instead
-  -k, --keyonly             Use the --name-only option instead
-  -o, -n, -g                Use long options instead
 
 Usage: shdotenv export [-n | -p] [--] [NAME]...
   Exports environment variables in posix-compliant .env format.
@@ -242,5 +237,4 @@ dialect: ruby
 | name               | description                             | default |
 | ------------------ | --------------------------------------- | ------- |
 | SHDOTENV_FORMAT    | Output format (`sh`, `fish`)            | `sh`    |
-| ~~SHDOTENV_SHELL~~ | Deprecated: Use SHDOTENV_FORMAT instead | `posix` |
 | SHDOTENV_AWK       | Path of the `awk` command               | `awk`   |

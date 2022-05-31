@@ -161,6 +161,8 @@ function output(flag, key, value) {
   if (FORMAT == "sh") output_sh(flag, key, value)
   if (FORMAT == "csh") output_csh(flag, key, value)
   if (FORMAT == "fish") output_fish(flag, key, value)
+  if (FORMAT == "json") output_json(flag, key, value)
+  if (FORMAT == "jsonl") output_jsonl(flag, key, value)
 }
 
 function output_sh(flag, key, value) {
@@ -195,6 +197,41 @@ function output_fish(flag, key, value) {
   if (flag == ONLY_EXPORT) print "set --export " key " \"$" key "\";"
   if (flag == DO_EXPORT) print "set --export " key " '" value "';"
   if (flag == NO_EXPORT) print "set " key " '" value "';"
+}
+
+function output_json(flag, key, value) {
+  if (flag == BEFORE_ALL) {
+    print "{"
+    delim = ""
+  } else if (flag == AFTER_ALL) {
+    printf "\n}\n"
+  } else if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
+    printf delim "  \"%s\": \"%s\"", key, json_escape(value)
+    delim = ",\n"
+  }
+}
+
+function output_jsonl(flag, key, value) {
+  if (flag == BEFORE_ALL) {
+    printf "{"
+    delim = ""
+  } else if (flag == AFTER_ALL) {
+    print " }"
+  } else if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
+    printf delim " \"%s\": \"%s\"", key, json_escape(value)
+    delim = ","
+  }
+}
+
+function json_escape(value) {
+  gsub(/\\/, "&&", value)
+  gsub(/\b/, "\\b", value)
+  gsub(/\f/, "\\f", value)
+  gsub(/\n/, "\\n", value)
+  gsub(/\r/, "\\r", value)
+  gsub(/\t/, "\\t", value)
+  gsub(/["]/, "\\\"", value)
+  return value
 }
 
 function parse(lines) {
@@ -263,7 +300,7 @@ function parse(lines) {
 BEGIN {
   IDENTIFIER = "[a-zA-Z_][a-zA-Z0-9_]*"
   KEEP = 1; NO_KEEP = 0
-  ONLY_EXPORT = 0; DO_EXPORT = 1; NO_EXPORT = 2
+  BEFORE_ALL = 0; ONLY_EXPORT = 1; DO_EXPORT = 2; NO_EXPORT = 3; AFTER_ALL = 9
   NO_QUOTES = 0; SINGLE_QUOTES = 1; DOUBLE_QUOTES = 2
 
   ESCAPE["$"] = "$"
@@ -286,7 +323,7 @@ BEGIN {
   }
 
   if (FORMAT == "") FORMAT = "sh"
-  if (!match(FORMAT, "^(sh|csh|fish)$")) {
+  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl)$")) {
     abort("unsupported format: " FORMAT)
   }
 
@@ -294,6 +331,8 @@ BEGIN {
     ARGV[1] = "/dev/stdin"
     ARGC = 2
   }
+
+  if (!NAMEONLY) output(BEFORE_ALL)
   for (i = 1; i < ARGC; i++) {
     getline < ARGV[i]
     lines = $0 "\n"
@@ -308,5 +347,6 @@ BEGIN {
     if (!match(ARGV[i], "^(/dev/stdin|-)$")) close(ARGV[i])
     parse(lines)
   }
+  if (!NAMEONLY) output(AFTER_ALL)
   exit
 }

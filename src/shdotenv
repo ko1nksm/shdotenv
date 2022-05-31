@@ -19,7 +19,7 @@ usage() {
     "                                posix, ruby, node, python," \
     "                                php, go, rust, docker" \
     "  -f, --format FORMAT       Output in the specified format [default: sh]" \
-    "                                sh, csh, fish, json, jsonl" \
+    "                                sh, csh, fish, json, jsonl, name" \
     "  -e, --env ENV_PATH        Location of the .env file [default: .env]" \
     "                              Multiple -e options are allowed" \
     "                              If the ENV_PATH is \"-\", read from stdin" \
@@ -27,7 +27,8 @@ usage() {
     "      --overload            Overload predefined environment variables" \
     "      --noexport            Do not append \"export\" prefix" \
     "      --grep PATTERN        Output only names that match the regexp pattern" \
-    "      --name-only           Output only environment variable names" \
+    "      --name-only           [Deprecated] Use --format name" \
+    "                            Output only environment variable names" \
     "  -q, --quiet               Suppress all output (useful for test .env files)" \
     "  -v, --version             Show the version and exit" \
     "  -h, --help                Show this message and exit" \
@@ -63,7 +64,7 @@ parse_options() {
       --overload) _shdotenv_overload=1 ;;
       --noexport) _shdotenv_allexport='' ;;
       --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
-      --name-only) _shdotenv_nameonly=1 ;;
+      --name-only) _shdotenv_format="name" ;;
       -q | --quiet) _shdotenv_quiet=1 ;;
       -v | --version) version && exit 0 ;;
       -h | --help) usage && exit 0 ;;
@@ -93,7 +94,7 @@ init_vars() {
   set --
   set -- "$@" _shdotenv_dialect= _shdotenv_format= _shdotenv_grep=
   set -- "$@" _shdotenv_envfiles= _shdotenv_overload= _shdotenv_allexport=1
-  set -- "$@" _shdotenv_nameonly= _shdotenv_quiet= _shdotenv_ignore=
+  set -- "$@" _shdotenv_quiet= _shdotenv_ignore=
   set -- "$@" _shdotenv_pos=1 _shdotenv_line=
   unexport "$@"
 
@@ -122,7 +123,6 @@ exec_parser() {
   [ "$_shdotenv_overload" ] && set -- -v OVERLOAD="$_shdotenv_overload" "$@"
   [ "$_shdotenv_allexport" ] && set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
   [ "$_shdotenv_grep" ] && set -- -v GREP="$_shdotenv_grep" "$@"
-  [ "$_shdotenv_nameonly" ] && set -- -v NAMEONLY="$_shdotenv_nameonly" "$@"
   [ "$_shdotenv_ignore" ] && set -- -v IGNORE="$_shdotenv_ignore" "$@"
   "${SHDOTENV_AWK:-awk}" "$@"
 }
@@ -144,7 +144,7 @@ parse_options "$@"
 
 read_config_file ".shdotenv"
 
-if [ $(($# - _shdotenv_pos + 1)) -eq 0 ] || [ "$_shdotenv_nameonly" ]; then
+if [ $(($# - _shdotenv_pos + 1)) -eq 0 ]; then
   [ "$_shdotenv_quiet" ] && exec >/dev/null
   exec_parser "$@"
 else

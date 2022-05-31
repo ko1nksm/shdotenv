@@ -163,6 +163,7 @@ function output(flag, key, value) {
   if (FORMAT == "fish") output_fish(flag, key, value)
   if (FORMAT == "json") output_json(flag, key, value)
   if (FORMAT == "jsonl") output_jsonl(flag, key, value)
+  if (FORMAT == "name") output_name_only(flag, key, value)
 }
 
 function output_sh(flag, key, value) {
@@ -234,6 +235,12 @@ function json_escape(value) {
   return value
 }
 
+function output_name_only(flag, key, value) {
+  if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
+    print key
+  }
+}
+
 function parse(lines) {
   SQ_VALUE = "'[^\\\\']*'?"
   DQ_VALUE = "\"(\\\\\"|[^\"])*[\"]?"
@@ -260,11 +267,7 @@ function parse(lines) {
       key = parse_key(substr(line, 1, equal_pos - 1))
     }
 
-    if (NAMEONLY) {
-      if (!OVERLOAD && key in environ) continue
-      print key
-      environ[key] = ""
-    } else if (equal_pos == 0) {
+    if (equal_pos == 0) {
       output(ONLY_EXPORT, key)
     } else {
       export = (ALLEXPORT ? DO_EXPORT : NO_EXPORT)
@@ -323,7 +326,7 @@ BEGIN {
   }
 
   if (FORMAT == "") FORMAT = "sh"
-  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl)$")) {
+  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl|name)$")) {
     abort("unsupported format: " FORMAT)
   }
 
@@ -332,7 +335,7 @@ BEGIN {
     ARGC = 2
   }
 
-  if (!NAMEONLY) output(BEFORE_ALL)
+  output(BEFORE_ALL)
   for (i = 1; i < ARGC; i++) {
     getline < ARGV[i]
     lines = $0 "\n"
@@ -347,6 +350,6 @@ BEGIN {
     if (!match(ARGV[i], "^(/dev/stdin|-)$")) close(ARGV[i])
     parse(lines)
   }
-  if (!NAMEONLY) output(AFTER_ALL)
+  output(AFTER_ALL)
   exit
 }

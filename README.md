@@ -44,12 +44,23 @@ $ chmod +x $HOME/bin/shdotenv
 
 ### Build your own
 
-Requires [shfmt](https://github.com/mvdan/sh).
+**Build and install only**
 
 ```console
 $ git clone https://github.com/ko1nksm/shdotenv.git
 $ cd shdotenv
-$ make
+$ make build
+$ make install PREFIX=$HOME
+```
+
+**Full build**
+
+A full build requires requires [shfmt](https://github.com/mvdan/sh), [shellcheck](https://github.com/koalaman/shellcheck) and [shellspec](https://github.com/shellspec/shellspec).
+
+```console
+$ git clone https://github.com/ko1nksm/shdotenv.git
+$ cd shdotenv
+$ make MINIFY=true
 $ make install PREFIX=$HOME
 ```
 
@@ -69,7 +80,7 @@ Options:
                                 posix, ruby, node, python,
                                 php, go, rust, docker
   -f, --format FORMAT       Output in the specified format [default: sh]
-                                sh, fish
+                                sh, csh, fish, json, jsonl, name
   -e, --env ENV_PATH        Location of the .env file [default: .env]
                               Multiple -e options are allowed
                               If the ENV_PATH is "-", read from stdin
@@ -77,7 +88,8 @@ Options:
       --overload            Overload predefined environment variables
       --noexport            Do not append "export" prefix
       --grep PATTERN        Output only names that match the regexp pattern
-      --name-only           Output only environment variable names
+      --name-only           [Deprecated] Use --format name
+                            Output only environment variable names
   -q, --quiet               Suppress all output (useful for test .env files)
   -v, --version             Show the version and exit
   -h, --help                Show this message and exit
@@ -246,5 +258,5 @@ dialect: ruby
 
 | name               | description                             | default |
 | ------------------ | --------------------------------------- | ------- |
-| SHDOTENV_FORMAT    | Output format (`sh`, `fish`)            | `sh`    |
+| SHDOTENV_FORMAT    | Output format (`sh`, `fish`, etc.)      | `sh`    |
 | SHDOTENV_AWK       | Path of the `awk` command               | `awk`   |

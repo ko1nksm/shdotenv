@@ -17,7 +17,7 @@ jobs:
           echo "${HOME}/.local/bin" >> "$GITHUB_PATH"
           curl -fsSL https://git.io/shellspec | sh -s master -y
       - name: Make dist archive
-        run: make dist
+        run: make dist MINIFY=1
       - name: Create release
         id: create_release
         uses: actions/create-release@v1.0.0

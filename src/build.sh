@@ -8,7 +8,7 @@ minify() {
     line=${line#"${line%%[!$IFS]*}"}
     case $line in "#"* | "") continue ;; esac
     printf '%s\n' "$line"
-  done
+  done | shfmt -mn -ln posix
 }
 
 while IFS= read -r line; do
@@ -20,7 +20,13 @@ while IFS= read -r line; do
         printf "%s='" "$varname"
         printf '%s' "$data" | sed "s/'/'\\\\''/g"
         echo "'"
-      } | minify
+      } | {
+        if [ "${MINIFY:-}" ]; then
+          minify
+        else
+          cat
+        fi
+      }
       ;;
     *) printf '%s\n' "$line" ;;
   esac

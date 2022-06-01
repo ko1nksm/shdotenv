@@ -3,16 +3,18 @@ BINDIR := $(PREFIX)/bin
 
 .PHONY: build check test dist clean install uninstall
 
-build: test
+all: check test build
+
+build:
 	cat ./src/header > ./shdotenv
-	./src/build.sh < src/shdotenv | shfmt -mn -ln posix >> ./shdotenv
+	./src/build.sh < src/shdotenv >> ./shdotenv
 	chmod +x ./shdotenv
 
 check:
 	shfmt -d -ci -i 2 -ln posix src/build.sh src/shdotenv
 	shellcheck src/build.sh src/shdotenv
 
-test: check
+test:
 	shellspec +q
 
 fix:

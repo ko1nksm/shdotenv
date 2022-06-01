@@ -13,7 +13,7 @@ spec_helper_precheck() {
   # Available variables: VERSION, SHELL_TYPE, SHELL_VERSION
   : minimum_version "0.29.0"
 
-  if ! env "$AWK" "" 2>/dev/null; then
+  if ! env $AWK "" 2>/dev/null; then
     abort "awk not found"
   fi
 }
@@ -36,10 +36,10 @@ spec_helper_configure() {
   CR=$SHELLSPEC_CR    # \r 0x0D
 
   if [ "${AWK##*/}" = "gawk" ]; then
-    awk() { env "$AWK" "$@"; }
-  elif env "$AWK" -V > /dev/null 2>&1; then
-    awk() { env "$AWK" --traditional "$@"; }
+    awk() { env $AWK "$@"; }
+  elif env $AWK -V > /dev/null 2>&1; then
+    awk() { env $AWK --traditional "$@"; }
   else
-    awk() { env "$AWK" "$@"; }
+    awk() { env $AWK "$@"; }
   fi
 }

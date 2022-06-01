@@ -3,7 +3,7 @@
 set -eu
 
 docker build -t "dotenv:${0##*/}" - <<HERE
-FROM golang
+FROM golang:1.7
 RUN apt-get update && apt-get install -y vim
 RUN go get github.com/joho/godotenv github.com/joho/godotenv/cmd/godotenv
 WORKDIR /root

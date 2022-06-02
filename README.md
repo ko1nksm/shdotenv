@@ -80,7 +80,7 @@ Options:
                                 posix, ruby, node, python,
                                 php, go, rust, docker
   -f, --format FORMAT       Output in the specified format [default: sh]
-                                sh, csh, fish, json, jsonl, name
+                                sh, csh, fish, json, jsonl, yaml, name
   -e, --env ENV_PATH        Location of the .env file [default: .env]
                               Multiple -e options are allowed
                               If the ENV_PATH is "-", read from stdin
@@ -88,8 +88,6 @@ Options:
       --overload            Overload predefined environment variables
       --noexport            Do not append "export" prefix
       --grep PATTERN        Output only names that match the regexp pattern
-      --name-only           [Deprecated] Use --format name
-                            Output only environment variable names
   -q, --quiet               Suppress all output (useful for test .env files)
   -v, --version             Show the version and exit
   -h, --help                Show this message and exit
@@ -116,17 +114,23 @@ Set environment variables and execute the specified command.
 shdotenv [OPTION]... <COMMAND> [ARGUMENTS]...
 ```
 
+#### Test the .env file syntax
+
+```sh
+shdotenv --quiet --env .env
+```
+
 ### Use as a library
 
 Load the .env file into the shell script. When run on the shell, it exports to the current shell.
 
-### sh, bash, ksh, zsh, etc. (POSIX-compliant shells)
+#### sh, bash, ksh, zsh, etc. (POSIX-compliant shells)
 
 ```sh
 eval "$(shdotenv [OPTION]...)"
 ```
 
-### csh, tcsh
+#### csh, tcsh
 
 ```tcsh
 set newline='\
@@ -134,16 +138,10 @@ set newline='\
 eval "`shdotenv -f csh [OPTION]...`"
 ```
 
-### fish
+#### fish
 
 ```fish
 eval (shdotenv -f fish [OPTION]...)
-```
-
-### Test the .env file syntax
-
-```sh
-shdotenv --quiet --env .env
 ```
 
 ### Export environment variables safely

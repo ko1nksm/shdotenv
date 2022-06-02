@@ -163,6 +163,7 @@ function output(flag, key, value) {
   if (FORMAT == "fish") output_fish(flag, key, value)
   if (FORMAT == "json") output_json(flag, key, value)
   if (FORMAT == "jsonl") output_jsonl(flag, key, value)
+  if (FORMAT == "yaml") output_yaml(flag, key, value)
   if (FORMAT == "name") output_name_only(flag, key, value)
 }
 
@@ -221,6 +222,12 @@ function output_jsonl(flag, key, value) {
   } else if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
     printf delim " \"%s\": \"%s\"", key, json_escape(value)
     delim = ","
+  }
+}
+
+function output_yaml(flag, key, value) {
+  if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
+    printf "%s: \"%s\"\n", key, json_escape(value)
   }
 }
 
@@ -326,7 +333,7 @@ BEGIN {
   }
 
   if (FORMAT == "") FORMAT = "sh"
-  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl|name)$")) {
+  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl|yaml|name)$")) {
     abort("unsupported format: " FORMAT)
   }
 

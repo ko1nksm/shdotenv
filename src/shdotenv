@@ -27,8 +27,6 @@ usage() {
     "      --overload            Overload predefined environment variables" \
     "      --noexport            Do not append \"export\" prefix" \
     "      --grep PATTERN        Output only names that match the regexp pattern" \
-    "      --name-only           [Deprecated] Use --format name" \
-    "                            Output only environment variable names" \
     "  -q, --quiet               Suppress all output (useful for test .env files)" \
     "  -v, --version             Show the version and exit" \
     "  -h, --help                Show this message and exit" \
@@ -64,7 +62,6 @@ parse_options() {
       --overload) _shdotenv_overload=1 ;;
       --noexport) _shdotenv_allexport='' ;;
       --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
-      --name-only) _shdotenv_format="name" ;;
       -q | --quiet) _shdotenv_quiet=1 ;;
       -v | --version) version && exit 0 ;;
       -h | --help) usage && exit 0 ;;

@@ -79,23 +79,21 @@ trim() {
 }
 
 unexport() {
-  set -- "$@" "$*"
-  while [ $# -gt 1 ]; do
+  while [ $# -gt 0 ]; do
     unset "${1%%=*}"
+    eval "${1%%=*}=\${1#*=}"
     shift
   done
-  eval "$*"
 }
 
 init_vars() {
-  set --
-  set -- "$@" _shdotenv_dialect= _shdotenv_format= _shdotenv_grep=
+  set -- _shdotenv_parser= _shdotenv_exporter=
+  set -- "$@" _shdotenv_dialect= _shdotenv_format="${SHDOTENV_FORMAT:-}"
   set -- "$@" _shdotenv_envfiles= _shdotenv_overload= _shdotenv_allexport=1
-  set -- "$@" _shdotenv_quiet= _shdotenv_ignore=
+  set -- "$@" _shdotenv_grep= _shdotenv_quiet= _shdotenv_ignore=
   set -- "$@" _shdotenv_pos=1 _shdotenv_line=
   unexport "$@"
 
-  _shdotenv_format="${SHDOTENV_FORMAT:-}"
   _shdotenv_parser=$(cat src/parser.awk)     # @INCLUDE-FILE
   _shdotenv_exporter=$(cat src/exporter.awk) # @INCLUDE-FILE
 }
@@ -115,12 +113,12 @@ read_config_file() {
 exec_parser() {
   eval "set -- ${_shdotenv_envfiles:-.env}"
   set -- "$_shdotenv_parser" "$@"
-  [ "$_shdotenv_dialect" ] && set -- -v DIALECT="$_shdotenv_dialect" "$@"
-  [ "$_shdotenv_format" ] && set -- -v FORMAT="$_shdotenv_format" "$@"
-  [ "$_shdotenv_overload" ] && set -- -v OVERLOAD="$_shdotenv_overload" "$@"
-  [ "$_shdotenv_allexport" ] && set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
-  [ "$_shdotenv_grep" ] && set -- -v GREP="$_shdotenv_grep" "$@"
-  [ "$_shdotenv_ignore" ] && set -- -v IGNORE="$_shdotenv_ignore" "$@"
+  set -- -v DIALECT="$_shdotenv_dialect" "$@"
+  set -- -v FORMAT="$_shdotenv_format" "$@"
+  set -- -v OVERLOAD="$_shdotenv_overload" "$@"
+  set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
+  set -- -v GREP="$_shdotenv_grep" "$@"
+  set -- -v IGNORE="$_shdotenv_ignore" "$@"
   "${SHDOTENV_AWK:-awk}" "$@"
 }
 
@@ -132,8 +130,7 @@ exec_exporter() {
   [ "${AWKPATH+x}" ] && set -- "AWKPATH=$AWKPATH" "$@"
   [ "${AWKLIBPATH+x}" ] && set -- "AWKLIBPATH=$AWKLIBPATH" "$@"
 
-  set -- "$_shdotenv_exporter" "$@"
-  "${SHDOTENV_AWK:-awk}" "$@"
+  "${SHDOTENV_AWK:-awk}" "$_shdotenv_exporter" "$@"
 }
 
 init_vars

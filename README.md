@@ -31,7 +31,6 @@ shdotenv safely loads the syntax of .env files that are compatible with POSIX sh
 
 - POSIX shell (dash, bash, ksh, zsh, etc)
 - awk (gawk, nawk, mawk, busybox awk)
-- `env` command
 
 ## Install
 

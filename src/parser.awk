@@ -248,6 +248,42 @@ function output_name_only(flag, key, value) {
   }
 }
 
+function process_begin() {
+  output(BEFORE_ALL)
+}
+
+function process_main(export, key, value) {
+  if (OVERLOAD) {
+    environ[key] = value
+    vars[key] = export ":" value
+    if (key in defined_key) return
+    defined_key[key] = FILENAME
+  } else {
+    if (key in defined_key) {
+      msg = "%s: `%s' is already defined in the %s"
+      abort(sprintf(msg, FILENAME, key, defined_key[key]))
+    }
+    defined_key[key] = FILENAME
+    if (key in environ) return
+    environ[key] = value
+    vars[key] = export ":" value
+  }
+  defined_keys = defined_keys " " key
+}
+
+function process_finish() {
+  len = split(trim(defined_keys), keys)
+  for(i = 1; i <= len; i++) {
+    key = keys[i]
+    if (!match(key, GREP)) continue
+    match(vars[key], ":")
+    export = substr(vars[key], 1, RSTART - 1)
+    value = substr(vars[key], RSTART + 1)
+    output(export, key, value)
+  }
+  output(AFTER_ALL)
+}
+
 function parse(lines) {
   SQ_VALUE = "'[^\\\\']*'?"
   DQ_VALUE = "\"(\\\\\"|[^\"])*[\"]?"
@@ -300,9 +336,7 @@ function parse(lines) {
         }
         value = parse_unquoted_value(value)
       }
-      if (!OVERLOAD && key in environ) continue
-      environ[key] = value
-      if (match(key, GREP)) output(export, key, value)
+      process_main(export, key, value)
     }
   }
 }
@@ -342,21 +376,22 @@ BEGIN {
     ARGC = 2
   }
 
-  output(BEFORE_ALL)
+  process_begin()
   for (i = 1; i < ARGC; i++) {
-    getline < ARGV[i]
+    FILENAME = ARGV[i]
+    getline < FILENAME
     lines = $0 "\n"
     if (DIALECT == "" && sub("^# dotenv ", "")) DIALECT = $0
     if (DIALECT == "") DIALECT = "posix"
     if (!dialect("posix|docker|ruby|node|python|php|go|rust")) {
       abort("unsupported dotenv dialect: " DIALECT)
     }
-    while (getline < ARGV[i] > 0) {
+    while (getline < FILENAME > 0) {
       lines = lines $0 "\n"
     }
-    if (!match(ARGV[i], "^(/dev/stdin|-)$")) close(ARGV[i])
+    if (!match(FILENAME, "^(/dev/stdin|-)$")) close(FILENAME)
     parse(lines)
   }
-  output(AFTER_ALL)
+  process_finish()
   exit
 }

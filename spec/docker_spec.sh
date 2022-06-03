@@ -33,7 +33,6 @@ Describe "dotenv docker parser"
     }
     When call parse_env "$(data)"
     The status should be failure
-    The output should eq "$(result)"
     The error should eq "\`line 2'': not a variable definition"
   End
 End

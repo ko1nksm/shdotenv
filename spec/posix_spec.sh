@@ -43,16 +43,6 @@ Describe "dotenv posix parser"
     The status should be success
   End
 
-  It "does not accept unsupported dotenv dialect"
-    data() { %text
-      #|# dotenv unknown
-      #|FOO=value
-    }
-    When call parse_env "$(data)"
-    The status should be failure
-    The error should eq 'unsupported dotenv dialect: unknown'
-  End
-
   Context "when the key is given"
     Describe
       Parameters
@@ -236,53 +226,6 @@ Describe "dotenv posix parser"
         When call parse_env "$1"
         The output should eq "$2"
       End
-    End
-
-    It "expands variables"
-      BeforeCall "unset VAR FOO ||:"
-      data() { %text
-        #|VAR=123
-        #|FOO="[${VAR}]"
-      }
-      result() { %text
-        #|VAR='123'
-        #|FOO='[123]'
-      }
-      When call parse_env "$(data)"
-      The output should eq "$(result)"
-    End
-
-    It "expands variables with exported values"
-      BeforeCall "export VAR=456"
-      data() { %text
-        #|FOO="[${VAR}]"
-      }
-      result() { %text
-        #|FOO='[456]'
-      }
-      When call parse_env "$(data)"
-      The output should eq "$(result)"
-    End
-
-    It "does not overload the exported value unless in overload mode"
-      BeforeCall "export FOO=123"
-      data() { %text
-        #|FOO=456
-      }
-      When call parse_env "$(data)" -v OVERLOAD=0
-      The output should eq ""
-    End
-
-    It "overloads the exported value in overload mode"
-      BeforeCall "export FOO=123"
-      data() { %text
-        #|FOO=456
-      }
-      result() { %text
-        #|FOO='456'
-      }
-      When call parse_env "$(data)" -v OVERLOAD=1
-      The output should eq "$(result)"
     End
 
     It "parses multi-line values"

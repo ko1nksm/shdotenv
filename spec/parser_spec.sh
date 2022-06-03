@@ -40,6 +40,33 @@ Describe "dotenv posix parser"
       When call parse_env "$(data)"
       The output should eq "$(result)"
     End
+
+    It "expands variables with exported values"
+      BeforeCall "unset VAR"
+      data() { %text
+        #|FOO="[${VAR}]"
+      }
+      result() { %text
+        #|FOO='[]'
+      }
+      When call parse_env "$(data)"
+      The output should eq "$(result)"
+    End
+
+    Context "when in nounset mode"
+      It "would be failure"
+        BeforeCall "unset VAR"
+        data() { %text
+          #|FOO="[${VAR}]"
+        }
+        result() { %text
+          #|FOO='[]'
+        }
+        When call parse_env "$(data)" -v NOUNSET=1
+        The error should eq "VAR: the key is not set"
+        The status should be failure
+      End
+    End
   End
 
   Context "when not in overload mode"

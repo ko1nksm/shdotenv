@@ -25,7 +25,8 @@ usage() {
     "                              If the ENV_PATH is \"-\", read from stdin" \
     "  -i, --ignore-environment  Ignore the current environment variables" \
     "      --overload            Overload predefined environment variables" \
-    "      --noexport            Do not append \"export\" prefix" \
+    "      --noexport            [Deprecated] Use --no-allexport" \
+    "      --no-allexport        Disable all variable export" \
     "      --no-nounset          Disable errors by reference to undefined variables" \
     "      --grep PATTERN        Output only names that match the regexp pattern" \
     "  -q, --quiet               Suppress all output (useful for test .env files)" \
@@ -61,7 +62,7 @@ parse_options() {
         ;;
       -i | --ignore-environment) _shdotenv_ignore=1 ;;
       --overload) _shdotenv_overload=1 ;;
-      --noexport) _shdotenv_allexport='' ;;
+      --no-allexport | --noexport) _shdotenv_allexport='' ;;
       --no-nounset) _shdotenv_nounset='' ;;
       --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
       -q | --quiet) _shdotenv_quiet=1 ;;

@@ -26,6 +26,7 @@ usage() {
     "  -i, --ignore-environment  Ignore the current environment variables" \
     "      --overload            Overload predefined environment variables" \
     "      --noexport            Do not append \"export\" prefix" \
+    "      --no-nounset          Disable errors by reference to undefined variables" \
     "      --grep PATTERN        Output only names that match the regexp pattern" \
     "  -q, --quiet               Suppress all output (useful for test .env files)" \
     "  -v, --version             Show the version and exit" \
@@ -61,6 +62,7 @@ parse_options() {
       -i | --ignore-environment) _shdotenv_ignore=1 ;;
       --overload) _shdotenv_overload=1 ;;
       --noexport) _shdotenv_allexport='' ;;
+      --no-nounset) _shdotenv_nounset='' ;;
       --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
       -q | --quiet) _shdotenv_quiet=1 ;;
       -v | --version) version && exit 0 ;;
@@ -97,7 +99,8 @@ unexport() {
 init_vars() {
   set -- _shdotenv_parser= _shdotenv_exporter=
   set -- "$@" _shdotenv_dialect= _shdotenv_format="${SHDOTENV_FORMAT:-}"
-  set -- "$@" _shdotenv_envfiles= _shdotenv_overload= _shdotenv_allexport=1
+  set -- "$@" _shdotenv_envfiles= _shdotenv_overload=
+  set -- "$@" _shdotenv_allexport=1 _shdotenv_nounset=1
   set -- "$@" _shdotenv_grep= _shdotenv_quiet= _shdotenv_ignore=
   set -- "$@" _shdotenv_pos=1 _shdotenv_line=
   unexport "$@"
@@ -125,6 +128,7 @@ exec_parser() {
   set -- -v FORMAT="$_shdotenv_format" "$@"
   set -- -v OVERLOAD="$_shdotenv_overload" "$@"
   set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
+  set -- -v NOUNSET="$_shdotenv_nounset" "$@"
   set -- -v GREP="$_shdotenv_grep" "$@"
   set -- -v IGNORE="$_shdotenv_ignore" "$@"
   "${SHDOTENV_AWK:-awk}" "$@"

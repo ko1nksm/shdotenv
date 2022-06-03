@@ -47,7 +47,9 @@ function unquote(str, quote) {
 }
 
 function expand_env(key) {
-  return (key in environ) ? environ[key] : ""
+  if (key in environ) return environ[key]
+  if (!NOUNSET) return ""
+  abort(sprintf("%s: the key is not set", key))
 }
 
 function parse_key(key) {

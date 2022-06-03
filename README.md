@@ -6,6 +6,8 @@ dotenv for shells with support for POSIX-compliant and multiple .env file syntax
 
 **Project Status**: Almost complete. Major features have been implemented and v1.0.0 will be released in the near future.
 
+**Important Notes**: Incompatible changes were made in Version 0.12.0. If a definition with the same name exists in the `.env` file when `--overload` is specified, the later definition takes precedence. Also, it has been changed to default to an error for undesirable usage. We believe this change will not affect many cases, but if you have a problem, please open an issue.
+
 Quoting [bkeepers/dotenv][dotenv]:
 
 > Storing [configuration in the environment](http://12factor.net/config) is one of the tenets of a [twelve-factor app](http://12factor.net). Anything that is likely to change between deployment environments–such as resource handles for databases or credentials for external services–should be extracted from the code into environment variables.
@@ -84,8 +86,10 @@ Options:
                               Multiple -e options are allowed
                               If the ENV_PATH is "-", read from stdin
   -i, --ignore-environment  Ignore the current environment variables
-      --overload            Overload predefined environment variables
-      --noexport            Do not append "export" prefix
+      --overload            Overload predefined variables
+      --no-allexport        Disable all variable export
+                              Same as deprecated --noexport
+      --no-nounset          Allow references to undefined variables
       --grep PATTERN        Output only names that match the regexp pattern
   -q, --quiet               Suppress all output (useful for test .env files)
   -v, --version             Show the version and exit
@@ -257,3 +261,37 @@ dialect: ruby
 | ------------------ | --------------------------------------- | ------- |
 | SHDOTENV_FORMAT    | Output format (`sh`, `fish`, etc.)      | `sh`    |
 | SHDOTENV_AWK       | Path of the `awk` command               | `awk`   |
+
+## FAQ
+
+**Note and reference**: The FAQs present on [motdotla's dotenv](https://github.com/motdotla/dotenv#faq) node project page and [cdimascio's dotenv-java](https://github.com/cdimascio/dotenv-java#faq) project page are so well done that I've included those that are relevant in the FAQs above.
+
+### Q: Should I deploy a .env to e.g. production?
+
+A: Tenant III of the [12 factor app methodology](https://12factor.net/config) states "The twelve-factor app stores config in environment variables". Thus, it is not recommended to provide the .env file to such environments. dotenv, however, is super useful in e.g a local development environment as it enables a developer to manage the environment via a file which is more convenient.
+
+Using dotenv in production would be cheating. This type of usage, however is an anti-pattern.
+
+### Q: Should I commit my .env file?
+
+No. We **strongly** recommend against committing your `.env` file to version control. It should only include environment-specific values such as database passwords or API keys. Your production database should have a different password than your development database.
+
+### Q: What happens to environment variables that were already set?
+
+By default, we will never modify any environment variables that have already been set. In particular, if there is a variable in your `.env` file which collides with one that already exists in your environment, then that variable will be skipped.
+
+If instead, you want to override environment variables use the `--overload` option.
+
+```sh
+shdotenv --overload
+```
+
+### Q: Why can't I define an environment variable with the same name in the .env file?
+
+We allows multiple .env files for convenience and interoperability with other dotenv tools. However, we believe that being able to use the same name in different .env files will lead to environment variables that are not "fully orthogonal" as [The Twelve-Factor App outlines](https://12factor.net/config).
+
+> In a twelve-factor app, env vars are granular controls, each fully orthogonal to other env vars. They are never grouped together as “environments”, but instead are independently managed for each deploy. This is a model that scales up smoothly as the app naturally expands into more deploys over its lifetime.
+>
+> – The Twelve-Factor App
+
+If you want to override a previous definition, use the `--overload` option.

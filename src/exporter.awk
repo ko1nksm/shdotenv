@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 
 function abort(msg) {
-  print msg > "/dev/stderr"
+  print PROGNAME ": " msg > "/dev/stderr"
   exit 1
 }
 
@@ -60,7 +60,7 @@ BEGIN {
       i++
       break
     } else if (substr(ARGV[i], 1, 1) == "-") {
-      abort("shdotenv export: Unknown option: " ARGV[i])
+      abort("export: Unknown option: " ARGV[i])
     } else {
       break
     }

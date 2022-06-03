@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 
 function abort(msg) {
-  print msg > "/dev/stderr"
+  print PROGNAME ": " msg > "/dev/stderr"
   exit 1
 }
 

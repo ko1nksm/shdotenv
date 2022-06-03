@@ -36,10 +36,10 @@ spec_helper_configure() {
   CR=$SHELLSPEC_CR    # \r 0x0D
 
   if [ "${AWK##*/}" = "gawk" ]; then
-    awk() { env $AWK "$@"; }
+    awk() { env $AWK -v PROGNAME="shdotenv" "$@"; }
   elif env $AWK -V > /dev/null 2>&1; then
-    awk() { env $AWK --traditional "$@"; }
+    awk() { env $AWK --traditional -v PROGNAME="shdotenv" "$@"; }
   else
-    awk() { env $AWK "$@"; }
+    awk() { env $AWK -v PROGNAME="shdotenv" "$@"; }
   fi
 }

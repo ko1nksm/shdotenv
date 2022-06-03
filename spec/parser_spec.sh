@@ -11,7 +11,7 @@ Describe "dotenv posix parser"
     }
     When call parse_env "$(data)"
     The status should be failure
-    The error should eq 'unsupported dotenv dialect: unknown'
+    The error should eq 'shdotenv: unsupported dotenv dialect: unknown'
   End
 
   Context "when the double quoted value is given"
@@ -63,7 +63,7 @@ Describe "dotenv posix parser"
           #|FOO='[]'
         }
         When call parse_env "$(data)" -v NOUNSET=1
-        The error should eq "VAR: the key is not set"
+        The error should eq "shdotenv: VAR: the key is not set"
         The status should be failure
       End
     End
@@ -87,7 +87,7 @@ Describe "dotenv posix parser"
       }
       When call parse_env "$(data)" -v OVERLOAD=0
       The output should eq ""
-      The error should eq "/dev/stdin: \`FOO' is already defined in the /dev/stdin"
+      The error should eq "shdotenv: /dev/stdin: \`FOO' is already defined in the /dev/stdin"
       The status should be failure
     End
   End

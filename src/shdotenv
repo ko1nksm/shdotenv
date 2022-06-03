@@ -45,9 +45,9 @@ usage() {
     "  environment variable name that are valid as identifier for posix shell."
 }
 
-abort() { echo "shdotenv:" "$@" >&2 && exit 1; }
+abort() { echo "$_shdotenv_progname:" "$@" >&2 && exit 1; }
 requires() {
-  [ $# -gt 1 ] || abort "Error: $1 option requires an argument"
+  [ $# -gt 1 ] || abort "error: $1 option requires an argument"
   _shdotenv_pos=$((_shdotenv_pos + 1))
 }
 
@@ -69,7 +69,7 @@ parse_options() {
       -v | --version) version && exit 0 ;;
       -h | --help) usage && exit 0 ;;
       --) _shdotenv_pos=$((_shdotenv_pos + 1)) && break ;;
-      -*) abort "Unknown option: $1" ;;
+      -*) abort "unknown option: $1" ;;
       *) break ;;
     esac
     shift
@@ -98,7 +98,7 @@ unexport() {
 }
 
 init_vars() {
-  set -- _shdotenv_parser= _shdotenv_exporter=
+  set -- _shdotenv_progname="$1" _shdotenv_parser= _shdotenv_exporter=
   set -- "$@" _shdotenv_dialect= _shdotenv_format="${SHDOTENV_FORMAT:-}"
   set -- "$@" _shdotenv_envfiles= _shdotenv_overload=
   set -- "$@" _shdotenv_allexport=1 _shdotenv_nounset=1
@@ -117,7 +117,7 @@ read_config_file() {
     trim _shdotenv_line "$_shdotenv_line"
     case $_shdotenv_line in
       dialect:*) trim _shdotenv_dialect "${_shdotenv_line#*:}" ;;
-      *) abort "Unknown line in $1: $_shdotenv_line" ;;
+      *) abort "unknown line in $1: $_shdotenv_line" ;;
     esac
   done <"$1"
 }
@@ -125,6 +125,7 @@ read_config_file() {
 exec_parser() {
   eval "set -- ${_shdotenv_envfiles:-.env}"
   set -- "$_shdotenv_parser" "$@"
+  set -- -v PROGNAME="$_shdotenv_progname" "$@"
   set -- -v DIALECT="$_shdotenv_dialect" "$@"
   set -- -v FORMAT="$_shdotenv_format" "$@"
   set -- -v OVERLOAD="$_shdotenv_overload" "$@"
@@ -143,10 +144,11 @@ exec_exporter() {
   [ "${AWKPATH+x}" ] && set -- "AWKPATH=$AWKPATH" "$@"
   [ "${AWKLIBPATH+x}" ] && set -- "AWKLIBPATH=$AWKLIBPATH" "$@"
 
-  "${SHDOTENV_AWK:-awk}" "$_shdotenv_exporter" "$@"
+  set -- -v PROGNAME="$_shdotenv_progname" "$_shdotenv_exporter" "$@"
+  "${SHDOTENV_AWK:-awk}" "$@"
 }
 
-init_vars
+init_vars "${0##*/}"
 parse_options "$@"
 
 read_config_file ".shdotenv"

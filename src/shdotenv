@@ -24,10 +24,10 @@ usage() {
     "                              Multiple -e options are allowed" \
     "                              If the ENV_PATH is \"-\", read from stdin" \
     "  -i, --ignore-environment  Ignore the current environment variables" \
-    "      --overload            Overload predefined environment variables" \
-    "      --noexport            [Deprecated] Use --no-allexport" \
+    "      --overload            Overload predefined variables" \
     "      --no-allexport        Disable all variable export" \
-    "      --no-nounset          Disable errors by reference to undefined variables" \
+    "                              Same as deprecated --noexport" \
+    "      --no-nounset          Allow references to undefined variables" \
     "      --grep PATTERN        Output only names that match the regexp pattern" \
     "  -q, --quiet               Suppress all output (useful for test .env files)" \
     "  -v, --version             Show the version and exit" \

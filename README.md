@@ -133,6 +133,12 @@ Load the .env file into the shell script. When run on the shell, it exports to t
 eval "$(shdotenv [OPTION]...)"
 ```
 
+You may want to abort the program when the `.env` file fails to parse. In that case, do the following
+
+```sh
+eval "$(shdotenv [OPTION]... || echo "exit $?")"
+```
+
 #### csh, tcsh
 
 ```tcsh

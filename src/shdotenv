@@ -29,6 +29,7 @@ usage() {
     "                              Same as deprecated --noexport" \
     "      --no-nounset          Allow references to undefined variables" \
     "      --grep PATTERN        Output only names that match the regexp pattern" \
+    "  -s, --sort                Sort variable names" \
     "  -q, --quiet               Suppress all output (useful for test .env files)" \
     "  -v, --version             Show the version and exit" \
     "  -h, --help                Show this message and exit" \
@@ -65,6 +66,7 @@ parse_options() {
       --no-allexport | --noexport) _shdotenv_allexport='' ;;
       --no-nounset) _shdotenv_nounset='' ;;
       --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
+      -s | --sort) _shdotenv_sort=1 ;;
       -q | --quiet) _shdotenv_quiet=1 ;;
       -v | --version) version && exit 0 ;;
       -h | --help) usage && exit 0 ;;
@@ -98,14 +100,15 @@ unexport() {
 }
 
 init_vars() {
-  set -- _shdotenv_progname= _shdotenv_parser= _shdotenv_exporter=
+  set -- _shdotenv_progname= _shdotenv_pos=1 _shdotenv_line=
+  set -- "$@" _shdotenv_libawk= _shdotenv_parser= _shdotenv_exporter=
   set -- "$@" _shdotenv_dialect= _shdotenv_format="${SHDOTENV_FORMAT:-}"
-  set -- "$@" _shdotenv_envfiles= _shdotenv_overload=
+  set -- "$@" _shdotenv_envfiles= _shdotenv_overload= _shdotenv_grep=
   set -- "$@" _shdotenv_allexport=1 _shdotenv_nounset=1
-  set -- "$@" _shdotenv_grep= _shdotenv_quiet= _shdotenv_ignore=
-  set -- "$@" _shdotenv_pos=1 _shdotenv_line=
+  set -- "$@" _shdotenv_quiet= _shdotenv_ignore= _shdotenv_sort=
   unexport "$@"
 
+  _shdotenv_libawk=$(cat src/lib.awk)        # @INCLUDE-FILE
   _shdotenv_parser=$(cat src/parser.awk)     # @INCLUDE-FILE
   _shdotenv_exporter=$(cat src/exporter.awk) # @INCLUDE-FILE
 }
@@ -124,7 +127,7 @@ read_config_file() {
 
 exec_parser() {
   eval "set -- ${_shdotenv_envfiles:-.env}"
-  set -- "$_shdotenv_parser" "$@"
+  set -- "${_shdotenv_libawk}${_shdotenv_parser}" "$@"
   set -- -v PROGNAME="$_shdotenv_progname" "$@"
   set -- -v DIALECT="$_shdotenv_dialect" "$@"
   set -- -v FORMAT="$_shdotenv_format" "$@"
@@ -133,6 +136,7 @@ exec_parser() {
   set -- -v NOUNSET="$_shdotenv_nounset" "$@"
   set -- -v GREP="$_shdotenv_grep" "$@"
   set -- -v IGNORE="$_shdotenv_ignore" "$@"
+  set -- -v SORT="$_shdotenv_sort" "$@"
   "${SHDOTENV_AWK:-awk}" "$@"
 }
 
@@ -144,7 +148,8 @@ exec_exporter() {
   [ "${AWKPATH+x}" ] && set -- "AWKPATH=$AWKPATH" "$@"
   [ "${AWKLIBPATH+x}" ] && set -- "AWKLIBPATH=$AWKLIBPATH" "$@"
 
-  set -- -v PROGNAME="$_shdotenv_progname" "$_shdotenv_exporter" "$@"
+  set -- "${_shdotenv_libawk}${_shdotenv_exporter}" "$@"
+  set -- -v PROGNAME="$_shdotenv_progname" "$@"
   "${SHDOTENV_AWK:-awk}" "$@"
 }
 

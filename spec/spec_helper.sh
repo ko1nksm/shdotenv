@@ -35,11 +35,15 @@ spec_helper_configure() {
   VT=$SHELLSPEC_VT    # \v 0x0B
   CR=$SHELLSPEC_CR    # \r 0x0D
 
+  do_awk() {
+    env $AWK -v PROGNAME="shdotenv" -f ./src/lib.awk "$@"
+  }
+
   if [ "${AWK##*/}" = "gawk" ]; then
-    awk() { env $AWK -v PROGNAME="shdotenv" "$@"; }
+    awk() { do_awk "$@"; }
   elif env $AWK -V > /dev/null 2>&1; then
-    awk() { env $AWK --traditional -v PROGNAME="shdotenv" "$@"; }
+    awk() { do_awk --traditional "$@"; }
   else
-    awk() { env $AWK -v PROGNAME="shdotenv" "$@"; }
+    awk() { do_awk "$@"; }
   fi
 }

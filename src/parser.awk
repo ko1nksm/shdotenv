@@ -1,10 +1,3 @@
-#!/usr/bin/awk -f
-
-function abort(msg) {
-  print PROGNAME ": " msg > "/dev/stderr"
-  exit 1
-}
-
 function syntax_error(msg) {
   sub("[\n]+$", "", CURRENT_LINE)
   abort(sprintf("`%s': %s", CURRENT_LINE, msg))
@@ -170,13 +163,7 @@ function output(flag, key, value) {
 }
 
 function output_sh(flag, key, value) {
-  if (match(value, /'/)) {
-    gsub(/[$`"\\]/, "\\\\&", value)
-    value = "\"" value "\""
-  } else {
-    value = "'" value "'"
-  }
-
+  value = quotes(value)
   if (flag == ONLY_EXPORT) print "export " key
   if (flag == DO_EXPORT) print "export " key "=" value
   if (flag == NO_EXPORT) print key "=" value
@@ -275,6 +262,7 @@ function process_main(export, key, value) {
 
 function process_finish() {
   len = split(trim(defined_keys), keys)
+  if (SORT) sort(keys)
   for(i = 1; i <= len; i++) {
     key = keys[i]
     if (!match(key, GREP)) continue

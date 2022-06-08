@@ -222,7 +222,7 @@ function output_yaml(flag, key, value) {
 
 function json_escape(value) {
   gsub(/\\/, "&&", value)
-  gsub(/\b/, "\\b", value)
+  gsub(/\10/, "\\b", value)
   gsub(/\f/, "\\f", value)
   gsub(/\n/, "\\n", value)
   gsub(/\r/, "\\r", value)

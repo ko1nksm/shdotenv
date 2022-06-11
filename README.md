@@ -91,6 +91,7 @@ Options:
                               Same as deprecated --noexport
       --no-nounset          Allow references to undefined variables
       --grep PATTERN        Output only names that match the regexp pattern
+  -s, --sort                Sort variable names
   -q, --quiet               Suppress all output (useful for test .env files)
   -v, --version             Show the version and exit
   -h, --help                Show this message and exit

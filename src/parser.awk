@@ -230,7 +230,7 @@ function output_php(flag, key, value) {
     printf "\n  return $env;\n"
     printf "}\n"
   } else if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
-    printf "  $env[\"%s\"] = \"%s\"\n", key, json_escape(value)
+    printf "  $env[\"%s\"] = \"%s\";\n", key, json_escape(value)
   }
 }
 

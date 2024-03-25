@@ -159,6 +159,7 @@ function output(flag, key, value) {
   if (FORMAT == "json") output_json(flag, key, value)
   if (FORMAT == "jsonl") output_jsonl(flag, key, value)
   if (FORMAT == "yaml") output_yaml(flag, key, value)
+  if (FORMAT == "php") output_php(flag, key, value)
   if (FORMAT == "name") output_name_only(flag, key, value)
 }
 
@@ -217,6 +218,19 @@ function output_jsonl(flag, key, value) {
 function output_yaml(flag, key, value) {
   if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
     printf "%s: \"%s\"\n", key, json_escape(value)
+  }
+}
+
+function output_php(flag, key, value) {
+  if (flag == BEFORE_ALL) {
+    print "<?php\n"
+    print "function __local_env() {"
+    print "  $env = [];"
+  } else if (flag == AFTER_ALL) {
+    printf "\n  return $env;\n"
+    printf "}\n"
+  } else if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
+    printf "  $env[\"%s\"] = \"%s\"\n", key, json_escape(value)
   }
 }
 
@@ -357,7 +371,7 @@ BEGIN {
   }
 
   if (FORMAT == "") FORMAT = "sh"
-  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl|yaml|name)$")) {
+  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl|yaml|php|name)$")) {
     abort("unsupported format: " FORMAT)
   }
 

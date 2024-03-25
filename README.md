@@ -81,7 +81,7 @@ Options:
                                 posix, ruby, node, python,
                                 php, go, rust, docker
   -f, --format FORMAT       Output in the specified format [default: sh]
-                                sh, csh, fish, json, jsonl, yaml, name
+                                sh, csh, fish, json, jsonl, yaml, name, php
   -e, --env ENV_PATH        Location of the .env file [default: .env]
                               Multiple -e options are allowed
                               If the ENV_PATH is "-", read from stdin

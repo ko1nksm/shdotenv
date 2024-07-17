@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: brew upgrade
-      - run: brew install dash bash ksh mksh yash zsh gawk mawk shellcheck
+      - run: brew install bash ksh93 mksh yash zsh gawk mawk shellcheck
       - name: Install shellspec
         run: |
           echo "${HOME}/.local/bin" >> "$GITHUB_PATH"

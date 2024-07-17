@@ -10,7 +10,7 @@ jobs:
     runs-on: macos-latest
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: brew upgrade
       - run: brew install dash bash ksh mksh yash zsh gawk mawk shellcheck
       - name: Install shellspec

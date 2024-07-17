@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: brew upgrade
       - run: brew install shfmt shellcheck
       - name: Install shellspec

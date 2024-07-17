@@ -2,7 +2,7 @@
 
 dotenv for shells with support for POSIX-compliant and multiple .env file syntax
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ko1nksm/shdotenv/macOS?logo=github)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ko1nksm/shdotenv/ubuntu.yml?branch=main&logo=github)
 
 **Project Status**: Almost complete. Major features have been implemented and v1.0.0 will be released in the near future.
 

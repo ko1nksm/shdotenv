@@ -1,6 +1,6 @@
 BEGIN {
   ex = envkeys_length = 0
-  prefix = nameonly = ""
+  prefix = mode = ""
 
   for (key in ENVIRON) {
     if (!match(key, "^[a-zA-Z_][a-zA-Z0-9_]*$")) continue
@@ -26,7 +26,9 @@ BEGIN {
     if (ARGV[i] == "-p") {
       prefix = "export "
     } else if (ARGV[i] == "-n") {
-      nameonly = 1
+      mode = "name"
+    } else if (ARGV[i] == "-v") {
+      mode = "value"
     } else if (ARGV[i] == "--") {
       i++
       break
@@ -48,8 +50,10 @@ BEGIN {
 
   for (i = 0; i < envkeys_length; i++ ) {
     if (envkeys[i] in environ) {
-      if (nameonly) {
+      if (mode == "name") {
         printf prefix "%s\n", envkeys[i]
+      } else if (mode == "value") {
+        printf prefix "%s\n", environ[envkeys[i]]
       } else {
         printf prefix "%s=%s\n", envkeys[i], quotes(environ[envkeys[i]])
       }

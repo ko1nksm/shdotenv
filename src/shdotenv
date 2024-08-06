@@ -34,9 +34,10 @@ usage() {
     "  -v, --version             Show the version and exit" \
     "  -h, --help                Show this message and exit" \
     "" \
-    "Usage: shdotenv export [-n | -v] [-p] [--] [NAME]..." \
+    "Usage: shdotenv export [-0] [-n | -v] [-p] [--] [NAME]..." \
     "  Exports environment variables. Default output is POSIX-compliant .env format." \
     "" \
+    "  -0  end each output line with NUL, not newline" \
     "  -n  List environment variable names only" \
     "  -v  List environment variable values only" \
     "  -p  Append \"export\" prefix to environment variable names" \

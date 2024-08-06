@@ -1,4 +1,19 @@
+function prinit(str) {
+  PRCHECK="(PATH=/dev/null; print \" -n\" 2>/dev/null) || printf -- f"
+  SH = "sh"; NUL = "\\0"; CR = "\\r"; LF = "\\n"
+  (SH " -c \047" PRCHECK "\047") | getline CMD
+  CMD = "print" (CMD == "--" ? "f " : CMD " -- ")
+}
+
+function pr(str, eol) {
+  gsub(/\\/, "&&", str)
+  gsub(/%/, "\\045", str)
+  gsub(/\047/, "\047\\\047\047", str)
+  print CMD "\047" str eol "\047" | SH
+}
+
 BEGIN {
+  prinit(); newline = LF
   ex = envkeys_length = 0
   prefix = mode = ""
 
@@ -29,6 +44,8 @@ BEGIN {
       mode = "name"
     } else if (ARGV[i] == "-v") {
       mode = "value"
+    } else if (ARGV[i] == "-0") {
+      newline = NUL
     } else if (ARGV[i] == "--") {
       i++
       break
@@ -51,11 +68,11 @@ BEGIN {
   for (i = 0; i < envkeys_length; i++ ) {
     if (envkeys[i] in environ) {
       if (mode == "name") {
-        printf prefix "%s\n", envkeys[i]
+        pr(prefix envkeys[i], newline)
       } else if (mode == "value") {
-        printf prefix "%s\n", environ[envkeys[i]]
+        pr(prefix environ[envkeys[i]], newline)
       } else {
-        printf prefix "%s=%s\n", envkeys[i], quotes(environ[envkeys[i]])
+        pr(prefix envkeys[i] "=" quotes(environ[envkeys[i]]), newline)
       }
     } else {
       ex = 1

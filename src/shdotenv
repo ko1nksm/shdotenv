@@ -26,7 +26,6 @@ usage() {
     "  -i, --ignore-environment  Ignore the current environment variables" \
     "      --overload            Overload predefined variables" \
     "      --no-allexport        Disable all variable export" \
-    "                              Same as deprecated --noexport" \
     "      --no-nounset          Allow references to undefined variables" \
     "      --grep PATTERN        Output only names that match the regexp pattern" \
     "  -s, --sort                Sort variable names" \
@@ -65,7 +64,7 @@ parse_options() {
         ;;
       -i | --ignore-environment) _shdotenv_ignore=1 ;;
       --overload) _shdotenv_overload=1 ;;
-      --no-allexport | --noexport) _shdotenv_allexport='' ;;
+      --no-allexport) _shdotenv_allexport='' ;;
       --no-nounset) _shdotenv_nounset='' ;;
       --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
       -s | --sort) _shdotenv_sort=1 ;;

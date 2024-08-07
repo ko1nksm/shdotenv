@@ -159,7 +159,6 @@ function output(flag, key, value) {
   if (FORMAT == "json") output_json(flag, key, value)
   if (FORMAT == "jsonl") output_jsonl(flag, key, value)
   if (FORMAT == "yaml") output_yaml(flag, key, value)
-  if (FORMAT == "name") output_name_only(flag, key, value)
 }
 
 function output_sh(flag, key, value) {
@@ -229,12 +228,6 @@ function json_escape(value) {
   gsub(/\t/, "\\t", value)
   gsub(/["]/, "\\\"", value)
   return value
-}
-
-function output_name_only(flag, key, value) {
-  if (flag == ONLY_EXPORT || flag == DO_EXPORT || flag == NO_EXPORT) {
-    print key
-  }
 }
 
 function process_begin() {
@@ -357,7 +350,7 @@ BEGIN {
   }
 
   if (FORMAT == "") FORMAT = "sh"
-  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl|yaml|name)$")) {
+  if (!match(FORMAT, "^(sh|csh|fish|json|jsonl|yaml)$")) {
     abort("unsupported format: " FORMAT)
   }
 

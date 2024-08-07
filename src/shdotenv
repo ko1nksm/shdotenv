@@ -33,7 +33,7 @@ usage() {
     "      --version             Show the version and exit" \
     "      --help                Show this message and exit" \
     "" \
-    "Usage: shdotenv export [-0] [-n | -v] [-p] [--] [NAME]..." \
+    "Usage: shdotenv [OPTION]... export [-0] [-n | -v] [-p] [-s] [--] [NAME]..." \
     "  Exports environment variables. Default output is POSIX-compliant .env format." \
     "" \
     "  -0  end each output line with NUL, not newline" \

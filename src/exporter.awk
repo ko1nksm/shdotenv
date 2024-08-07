@@ -15,7 +15,7 @@ function pr(str, eol) {
 BEGIN {
   prinit(); newline = LF
   ex = envkeys_length = 0
-  prefix = mode = ""
+  prefix = mode = silent = ""
 
   for (key in ENVIRON) {
     if (!match(key, "^[a-zA-Z_][a-zA-Z0-9_]*$")) continue
@@ -46,6 +46,8 @@ BEGIN {
       mode = "value"
     } else if (ARGV[i] == "-0") {
       newline = NUL
+    } else if (ARGV[i] == "-s") {
+      silent = 1
     } else if (ARGV[i] == "--") {
       i++
       break
@@ -76,6 +78,8 @@ BEGIN {
           ex = 1
         }
       }
+    } else if (silent) {
+      environ[key] = ""
     } else {
       error("export: The specified name cannot be found: " key)
       ex = 1
@@ -86,17 +90,13 @@ BEGIN {
 
   for (i = 0; i < envkeys_length; i++ ) {
     key = envkeys[i]
-    if (key in environ) {
-      value = environ[key]
-      if (mode == "name") {
-        pr(prefix key, newline)
-      } else if (mode == "value") {
-        pr(prefix value, newline)
-      } else {
-        pr(prefix key "=" quotes(value), newline)
-      }
+    value = environ[key]
+    if (mode == "name") {
+      pr(prefix key, newline)
+    } else if (mode == "value") {
+      pr(prefix value, newline)
     } else {
-      pr("", newline)
+      pr(prefix key "=" quotes(value), newline)
     }
   }
 

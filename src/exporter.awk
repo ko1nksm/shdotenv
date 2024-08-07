@@ -65,24 +65,38 @@ BEGIN {
     sort(envkeys)
   }
 
+  # Pre-check
   for (i = 0; i < envkeys_length; i++ ) {
-    if (envkeys[i] in environ) {
-      key = envkeys[i]; value = environ[key]
+    key = envkeys[i]
+    if (key in environ) {
+      value = environ[key]
+      if (mode == "value") {
+        if (newline != NUL && index(value, "\n") > 0) {
+          error("export: Use the -0 option to output value containing newline: " key)
+          ex = 1
+        }
+      }
+    } else {
+      error("export: The specified name cannot be found: " key)
+      ex = 1
+    }
+  }
+
+  if (ex != 0) exit ex
+
+  for (i = 0; i < envkeys_length; i++ ) {
+    key = envkeys[i]
+    if (key in environ) {
+      value = environ[key]
       if (mode == "name") {
         pr(prefix key, newline)
       } else if (mode == "value") {
-        if (newline != NUL && index(value, "\n") > 0) {
-          error("export: Use the -0 option to output value containing newline: " key)
-          value = ""
-          ex = 1
-        }
         pr(prefix value, newline)
       } else {
         pr(prefix key "=" quotes(value), newline)
       }
     } else {
       pr("", newline)
-      ex = 1
     }
   }
 

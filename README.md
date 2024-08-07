@@ -100,6 +100,7 @@ Usage: shdotenv export [-0] [-n | -v] [-p] [--] [NAME]...
   -n  List environment variable names only
   -v  List environment variable values only
   -p  Append "export" prefix to environment variable names
+  -s  Empty string instead of error if name is missing
 
   This will be output after the .env files is loaded. If you do not want
   to load it, specify "-e /dev/null". This is similar to "export", "env"

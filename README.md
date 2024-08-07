@@ -6,8 +6,6 @@ dotenv for shells with support for POSIX-compliant and multiple .env file syntax
 
 **Project Status**: Almost complete. Major features have been implemented and v1.0.0 will be released in the near future.
 
-**Important Notes**: Incompatible changes were made in Version 0.12.0. If a definition with the same name exists in the `.env` file when `--overload` is specified, the later definition takes precedence. Also, it has been changed to default to an error for undesirable usage. We believe this change will not affect many cases, but if you have a problem, please open an issue.
-
 Quoting [bkeepers/dotenv][dotenv]:
 
 > Storing [configuration in the environment](http://12factor.net/config) is one of the tenets of a [twelve-factor app](http://12factor.net). Anything that is likely to change between deployment environments–such as resource handles for databases or credentials for external services–should be extracted from the code into environment variables.
@@ -81,25 +79,26 @@ Options:
                                 posix, ruby, node, python,
                                 php, go, rust, docker
   -f, --format FORMAT       Output in the specified format [default: sh]
-                                sh, csh, fish, json, jsonl, yaml, name
+                                sh, csh, fish, json, jsonl, yaml
   -e, --env ENV_PATH        Location of the .env file [default: .env]
                               Multiple -e options are allowed
                               If the ENV_PATH is "-", read from stdin
   -i, --ignore-environment  Ignore the current environment variables
       --overload            Overload predefined variables
       --no-allexport        Disable all variable export
-                              Same as deprecated --noexport
       --no-nounset          Allow references to undefined variables
       --grep PATTERN        Output only names that match the regexp pattern
   -s, --sort                Sort variable names
   -q, --quiet               Suppress all output (useful for test .env files)
-  -v, --version             Show the version and exit
-  -h, --help                Show this message and exit
+      --version             Show the version and exit
+      --help                Show this message and exit
 
-Usage: shdotenv export [-n | -p] [--] [NAME]...
-  Exports environment variables in posix-compliant .env format.
+Usage: shdotenv export [-0] [-n | -v] [-p] [--] [NAME]...
+  Exports environment variables. Default output is POSIX-compliant .env format.
 
-  -n  List only environment variable names
+  -0  end each output line with NUL, not newline
+  -n  List environment variable names only
+  -v  List environment variable values only
   -p  Append "export" prefix to environment variable names
 
   This will be output after the .env files is loaded. If you do not want

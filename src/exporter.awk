@@ -70,7 +70,10 @@ BEGIN {
   # Pre-check
   for (i = 0; i < envkeys_length; i++ ) {
     key = envkeys[i]
-    if (key in environ) {
+    if (!match(key, "^[a-zA-Z_][a-zA-Z0-9_]*$")) {
+      error("export: Invalid environment variable name: " key)
+      ex = 1
+    } else if (key in environ) {
       value = environ[key]
       if (mode == "value") {
         if (newline != NUL && index(value, "\n") > 0) {

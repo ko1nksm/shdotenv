@@ -67,12 +67,18 @@ BEGIN {
 
   for (i = 0; i < envkeys_length; i++ ) {
     if (envkeys[i] in environ) {
+      key = envkeys[i]; value = environ[key]
       if (mode == "name") {
-        pr(prefix envkeys[i], newline)
+        pr(prefix key, newline)
       } else if (mode == "value") {
-        pr(prefix environ[envkeys[i]], newline)
+        if (newline != NUL && index(value, "\n") > 0) {
+          error("export: Use the -0 option to output value containing newline: " key)
+          value = ""
+          ex = 1
+        }
+        pr(prefix value, newline)
       } else {
-        pr(prefix envkeys[i] "=" quotes(environ[envkeys[i]]), newline)
+        pr(prefix key "=" quotes(value), newline)
       }
     } else {
       pr("", newline)

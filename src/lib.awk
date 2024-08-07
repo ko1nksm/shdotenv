@@ -1,5 +1,9 @@
-function abort(msg) {
+function error(msg) {
   print PROGNAME ": " msg > "/dev/stderr"
+}
+
+function abort(msg) {
+  error(msg)
   exit 1
 }
 

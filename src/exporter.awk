@@ -1,6 +1,5 @@
 function prinit(str) {
   PRCHECK="(PATH=/dev/null; print \" -n\" 2>/dev/null) || printf -- f"
-  SH = "sh"; NUL = "\\0"; CR = "\\r"; LF = "\\n"
   (SH " -c \047" PRCHECK "\047") | getline CMD
   CMD = "print" (CMD == "--" ? "f " : CMD " -- ")
 }
@@ -13,7 +12,8 @@ function pr(str, eol) {
 }
 
 BEGIN {
-  prinit(); newline = LF
+  SH = "sh"; NUL = "\\0"; CR = "\\r"; LF = "\\n"
+  newline = LF
   ex = envkeys_length = 0
   prefix = mode = silent = ""
 
@@ -45,6 +45,7 @@ BEGIN {
     } else if (ARGV[i] == "-v") {
       mode = "value"
     } else if (ARGV[i] == "-0") {
+      prinit()
       newline = NUL
     } else if (ARGV[i] == "-s") {
       silent = 1
@@ -95,11 +96,17 @@ BEGIN {
     key = envkeys[i]
     value = environ[key]
     if (mode == "name") {
-      pr(prefix key, newline)
+      line = prefix key
     } else if (mode == "value") {
-      pr(prefix value, newline)
+      line = value
     } else {
-      pr(prefix key "=" quotes(value), newline)
+      line = prefix key "=" quotes(value)
+    }
+
+    if (newline == NUL) {
+      pr(line, newline)
+    } else {
+      print line
     }
   }
 

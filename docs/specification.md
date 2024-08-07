@@ -141,6 +141,7 @@ The following characters have a special meaning in shell scripts and cannot be u
 
 ```
 [ ] { } ( ) < > " ' ` ! $ & ~ | ; \ * ?
+= (only for the first character)
 ```
 
 In the POSIX shell specification, it can be used by escaping it with a backslash, but it is better to use quotes.
@@ -151,7 +152,11 @@ In the POSIX shell specification, it can be used by escaping it with a backslash
 URL=http://example.com?name1=value1&name2=value2
 ```
 
-Note: `#` (without preceding spaces or tabs) can be used as a character.
+```sh
+URL==ls
+```
+
+Note: In zsh, it is expanded to the path of ls.
 
 **Valid**
 
@@ -159,6 +164,8 @@ Note: `#` (without preceding spaces or tabs) can be used as a character.
 URL1='http://example.com?name1=value1&name2=value2'
 URL2=http://example.com/index.html#this-is-hash #this-is-comment
 ```
+
+Note: `#` (without preceding spaces or tabs) can be used as a character.
 
 ### Variable expansion is not available
 

@@ -201,20 +201,21 @@ export EXPORT1="value"
 export EXPORT2 # Equivalent to: export EXPORT2="${EXPORT2:-}"
 ```
 
-- The syntax is a subset of the POSIX shell.
+- The syntax is a subset of the POSIX shell
 - The first line is an optional directive that specifies the dialect of the .env syntax
 - No spaces are allowed before or after the `=` separating the name and value
 - ANSI-C style escapes are not available (i.e., `\n` is not a newline)
 - **Unquoted value**
   - The special characters that can be used are `#` `%` `+` `,` `-` `.` `/` `:` `=` `@` `^` `_`
+  - Unquoted '=' not allowed for first character (Add in 0.14.0)
 - **Single-quoted value**
   - The disallowed character is: `'`
-  - It can contain newline characters.
+  - It can contain newline characters
 - **Double-quoted value**
   - Variable expansion is available (only `${VAR}` style is supported)
   - The following values should be escaped with a backslash (`\`): `$` <code>\`</code> `"` `\`
   - The `\` at the end of a line value means line continuation
-  - It can contain newline characters.
+  - It can contain newline characters
 - An optional `export` prefix can be added to the name
 - Comments at the end of a line need to be preceded by spaces before the `#`
 

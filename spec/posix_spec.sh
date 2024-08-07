@@ -65,6 +65,7 @@ Describe "dotenv posix parser"
         'FOO'             "shdotenv: \`FOO': not a variable definition"
         'FOO =value'      "shdotenv: \`FOO ': no space allowed after the key"
         'FOO= value'      "shdotenv: \`FOO= value': spaces are not allowed without quoting"
+        'FOO==value'      "shdotenv: \`FOO==value': unquoted '=' not allowed for first character"
         'FOO.BAR=value'   "shdotenv: \`FOO.BAR': the key is not a valid identifier"
         '0FOO=value'      "shdotenv: \`0FOO': the key is not a valid identifier"
         'export FOO.BAR'  "shdotenv: \`FOO.BAR': the key is not a valid identifier"
@@ -97,8 +98,8 @@ Describe "dotenv posix parser"
     Describe
       Parameters:value "#" "%" "+" "," "-" "." "/" ":" "=" "@" "^" "_" ""
       It "parses value the \`$1'"
-        When call parse_env "FOO=$1"
-        The output should eq "FOO='$1'"
+        When call parse_env "FOO=v$1"
+        The output should eq "FOO='v$1'"
       End
     End
 

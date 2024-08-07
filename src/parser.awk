@@ -82,6 +82,10 @@ function parse_unquoted_value(str) {
     if (match(str, "[][{}()<>\"'`!$&~|;\\\\*?]")) {
       syntax_error("using without quotes is not allowed: !$&()*;<>?[\\]`{|}~")
     }
+
+    if (match(str, /^=.*/)) {
+      syntax_error("unquoted '=' not allowed for first character")
+    }
   } else {
     str = trim(str)
   }

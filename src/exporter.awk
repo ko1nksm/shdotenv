@@ -75,6 +75,7 @@ BEGIN {
         pr(prefix envkeys[i] "=" quotes(environ[envkeys[i]]), newline)
       }
     } else {
+      pr("", newline)
       ex = 1
     }
   }

@@ -48,18 +48,18 @@ $ chmod +x $HOME/bin/shdotenv
 ```console
 $ git clone https://github.com/ko1nksm/shdotenv.git
 $ cd shdotenv
-$ make build
+$ make
 $ make install PREFIX=$HOME
 ```
 
-**Full build**
+**Full build (test and generate a small build)**
 
 A full build requires requires [shfmt](https://github.com/mvdan/sh), [shellcheck](https://github.com/koalaman/shellcheck) and [shellspec](https://github.com/shellspec/shellspec).
 
 ```console
 $ git clone https://github.com/ko1nksm/shdotenv.git
 $ cd shdotenv
-$ make MINIFY=true
+$ make all MINIFY=true
 $ make install PREFIX=$HOME
 ```
 
@@ -159,7 +159,7 @@ eval (shdotenv -f fish [OPTION]...)
 This is similar to `export`, `env` and `printenv` commands, but quoting correctly and exports only portable environment variable name that are valid as identifier for POSIX shell.
 
 ```text
-shdotenv export [-n | -p] [NAME]...
+shdotenv [OPTION]... export [OPTION]... [NAME]...
 ```
 
 ## How to work with docker

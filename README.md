@@ -162,20 +162,16 @@ This is similar to `export`, `env` and `printenv` commands, but quoting correctl
 shdotenv export [-n | -p] [NAME]...
 ```
 
-### Additional CLI utility
+## How to work with docker
 
-#### contrib/dockerenv
-
-The `docker` command has the `--env-file` option, but it only supports setting simple values.
+The `docker` command has the `--env-file` option, but it only supports setting simple values without newlines.
 
 - [docker cannot pass newlines from variables in --env-file files](https://github.com/moby/moby/issues/12997)
 
-This tool makes the files read by `--env-file` compatible with the `.env` format, and supports variable expansion and newlines.
-
-Example: (Use `dockerenv` instead of `docker`)
+shdotenv provides a simple solution to this problem.
 
 ```sh
-dockerenv run --env-file .env -it debian
+shdotenv docker run $(shdotenv -n | sed s/^/-e/) debian sh -c export
 ```
 
 ## .env file syntax

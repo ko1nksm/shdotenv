@@ -25,6 +25,7 @@ usage() {
     "                              If the ENV_PATH is \"-\", read from stdin" \
     "  -i, --ignore-environment  Ignore the current environment variables" \
     "      --overload            Overload predefined variables" \
+    "  -n, --name-only           Output only name" \
     "      --no-allexport        Disable all variable export" \
     "      --no-nounset          Allow references to undefined variables" \
     "      --grep PATTERN        Output only names that match the regexp pattern" \
@@ -65,6 +66,7 @@ parse_options() {
         ;;
       -i | --ignore-environment) _shdotenv_ignore=1 ;;
       --overload) _shdotenv_overload=1 ;;
+      -n | --name-only) _shdotenv_nameonly=1 ;;
       --no-allexport) _shdotenv_allexport='' ;;
       --no-nounset) _shdotenv_nounset='' ;;
       --grep) requires "$@" && shift && _shdotenv_grep="$1" ;;
@@ -106,7 +108,7 @@ init_vars() {
   set -- "$@" _shdotenv_libawk= _shdotenv_parser= _shdotenv_exporter=
   set -- "$@" _shdotenv_dialect= _shdotenv_format="${SHDOTENV_FORMAT:-}"
   set -- "$@" _shdotenv_envfiles= _shdotenv_overload= _shdotenv_grep=
-  set -- "$@" _shdotenv_allexport=1 _shdotenv_nounset=1
+  set -- "$@" _shdotenv_nameonly= _shdotenv_allexport=1 _shdotenv_nounset=1
   set -- "$@" _shdotenv_quiet= _shdotenv_ignore= _shdotenv_sort=
   unexport "$@"
 
@@ -134,6 +136,7 @@ exec_parser() {
   set -- -v DIALECT="$_shdotenv_dialect" "$@"
   set -- -v FORMAT="$_shdotenv_format" "$@"
   set -- -v OVERLOAD="$_shdotenv_overload" "$@"
+  set -- -v NAMEONLY="$_shdotenv_nameonly" "$@"
   set -- -v ALLEXPORT="$_shdotenv_allexport" "$@"
   set -- -v NOUNSET="$_shdotenv_nounset" "$@"
   set -- -v GREP="$_shdotenv_grep" "$@"

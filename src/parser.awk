@@ -297,7 +297,9 @@ function parse(lines) {
       key = parse_key(substr(line, 1, equal_pos - 1))
     }
 
-    if (equal_pos == 0) {
+    if (NAMEONLY) {
+      print key
+    } else if (equal_pos == 0) {
       output(ONLY_EXPORT, key)
     } else {
       export = (ALLEXPORT ? DO_EXPORT : NO_EXPORT)

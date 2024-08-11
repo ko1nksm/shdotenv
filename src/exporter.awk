@@ -1,3 +1,31 @@
+function getopts(optstring, args,  opt, oarg, i, j) {
+  i = int(OPTIND)
+  j = int(substr(OPTIND, length(i) + 2))
+  if (! (i in args)) return ""
+  if (args[i] == "--") { OPTIND = i + 1; return "" }
+  if (args[i] !~ /^-./) { return "" }
+  opt = substr(args[i], j + 2, 1)
+  oarg = substr(args[i], j + 3)
+  if (index(optstring, opt ":")) {
+    if (oarg == "") {
+      if ( (i + 1) in args ) {
+        OPTARG = args[i + 1]; OPTIND = i + 2
+      } else {
+        OPTARG = "option requires an argument -- " opt
+        opt = "?"
+      }
+    } else {
+      OPTARG = oarg; OPTIND = i + 1
+    }
+  } else if (index(optstring, opt)) {
+    OPTARG = ""; OPTIND = (oarg == "") ? (i + 1) : (i "," (j + 1))
+  } else {
+    OPTARG = "illegal option -- " opt
+    opt = "?"
+  }
+  return opt
+}
+
 function prinit(str) {
   PRCHECK="(PATH=/dev/null; print \" -n\" 2>/dev/null) || printf -- f"
   (SH " -c \047" PRCHECK "\047") | getline CMD
@@ -37,27 +65,16 @@ BEGIN {
     }
   }
 
-  for (; i < ARGC; i++) {
-    if (ARGV[i] == "-p") {
-      prefix = "export "
-    } else if (ARGV[i] == "-n") {
-      mode = "name"
-    } else if (ARGV[i] == "-v") {
-      mode = "value"
-    } else if (ARGV[i] == "-0") {
-      prinit()
-      newline = NUL
-    } else if (ARGV[i] == "-s") {
-      silent = 1
-    } else if (ARGV[i] == "--") {
-      i++
-      break
-    } else if (substr(ARGV[i], 1, 1) == "-") {
-      abort("export: Unknown option: " ARGV[i])
-    } else {
-      break
-    }
+  OPTIND = i
+  while(OPT = getopts("pnvs0", ARGV)) {
+    if (OPT == "p") prefix = "export "
+    if (OPT == "n") mode = "name"
+    if (OPT == "v") mode = "value"
+    if (OPT == "0") newline = NUL
+    if (OPT == "s") silent = 1
+    if (OPT == "?") abort("export: " OPTARG)
   }
+  i = OPTIND
 
   if (i < ARGC) {
     envkeys_length = 0
@@ -92,6 +109,7 @@ BEGIN {
 
   if (ex != 0) exit ex
 
+  if (newline == NUL) prinit()
   for (i = 0; i < envkeys_length; i++ ) {
     key = envkeys[i]
     value = environ[key]

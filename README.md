@@ -93,14 +93,14 @@ Options:
       --version             Show the version and exit
       --help                Show this message and exit
 
-Usage: shdotenv [OPTION]... export [-0] [-n | -v] [-p] [-s] [--] [NAME]...
+Usage: shdotenv [OPTION]... export [-0ps] [-n | -v] [--] [NAME]...
   Exports environment variables. Default output is POSIX-compliant .env format.
 
   -0  end each output line with NUL, not newline
-  -n  List environment variable names only
-  -v  List environment variable values only
   -p  Append "export" prefix to environment variable names
   -s  Empty string instead of error if name is missing
+  -n  List environment variable names only
+  -v  List environment variable values only
 
   This will be output after the .env files is loaded. If you do not want
   to load it, specify "-e /dev/null". This is similar to "export", "env"

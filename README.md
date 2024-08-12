@@ -37,9 +37,20 @@ shdotenv safely loads the syntax of .env files that are compatible with POSIX sh
 Download `shdotenv` (shell script) from [releases](https://github.com/ko1nksm/shdotenv/releases).
 
 ```console
-$ wget https://github.com/ko1nksm/shdotenv/releases/latest/download/shdotenv -O $HOME/bin/shdotenv
-$ chmod +x $HOME/bin/shdotenv
+$ mkdir -p "$HOME/bin"
+$ wget https://github.com/ko1nksm/shdotenv/releases/latest/download/shdotenv -O "$HOME/bin/shdotenv"
+$ chmod +x "$HOME/bin/shdotenv"
 ```
+
+If you prefer the XDG Base Directory Specification, you can install it under the `$HOME/.local/bin` directory.
+
+```console
+$ mkdir -p "$HOME/.local/bin"
+$ wget https://github.com/ko1nksm/shdotenv/releases/latest/download/shdotenv -O "$HOME/.local/bin/shdotenv"
+$ chmod +x "$HOME/.local/bin/shdotenv"
+```
+
+Do not forget to add the installed directory to the `PATH` environment variable.
 
 ### Build your own
 

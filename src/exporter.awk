@@ -3,22 +3,25 @@ function getopts(optstring, args,  opt, oarg, i, j) {
   j = int(substr(OPTIND, length(i) + 2))
   if (! (i in args)) return ""
   if (args[i] == "--") { OPTIND = i + 1; return "" }
-  if (args[i] !~ /^-./) { return "" }
+  if (args[i] !~ /^-./) return ""
   opt = substr(args[i], j + 2, 1)
   oarg = substr(args[i], j + 3)
   if (index(optstring, opt ":")) {
     if (oarg == "") {
       if ( (i + 1) in args ) {
-        OPTARG = args[i + 1]; OPTIND = i + 2
+        OPTARG = args[i + 1]
+        OPTIND = i + 2
       } else {
         OPTARG = "option requires an argument -- " opt
         opt = "?"
       }
     } else {
-      OPTARG = oarg; OPTIND = i + 1
+      OPTARG = oarg
+      OPTIND = i + 1
     }
   } else if (index(optstring, opt)) {
-    OPTARG = ""; OPTIND = (oarg == "") ? (i + 1) : (i "," (j + 1))
+    OPTARG = ""
+    OPTIND = (oarg == "") ? (i + 1) : (i "," (j + 1))
   } else {
     OPTARG = "illegal option -- " opt
     opt = "?"

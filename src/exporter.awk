@@ -1,32 +1,30 @@
-function getopts(optstring, args,  opt, oarg, i, j) {
-  i = int(OPTIND)
+function getopts(optstring, args,  i, j) {
+  i = OPTIND ? int(OPTIND) : (OPTIND = 1)
   j = int(substr(OPTIND, length(i) + 2))
-  if (! (i in args)) return ""
-  if (args[i] == "--") { OPTIND = i + 1; return "" }
-  if (args[i] !~ /^-./) return ""
-  opt = substr(args[i], j + 2, 1)
-  oarg = substr(args[i], j + 3)
-  if (index(optstring, opt ":")) {
-    if (oarg == "") {
-      if ( (i + 1) in args ) {
-        OPTARG = args[i + 1]
-        OPTIND = i + 2
-      } else {
-        OPTARG = "option requires an argument -- " opt
-        opt = "?"
+  OPTERR = OPTARG = ""
+  if (!(i in args)) return
+  if (args[i] == "--") { OPTIND = i + 1; return }
+  if (args[i] !~ /^-./) return
+  OPT = substr(args[i], j + 2, 1)
+  OPTARG = substr(args[i], j + 3)
+  if (index(optstring, OPT ":")) {
+    if (OPTARG == "") {
+      if (!(++i in args)) {
+        OPTERR = "option requires an argument -- " OPT
+        OPTARG = ":"
+        return
       }
-    } else {
-      OPTARG = oarg
-      OPTIND = i + 1
+      OPTARG = args[i]
     }
-  } else if (index(optstring, opt)) {
-    OPTARG = ""
-    OPTIND = (oarg == "") ? (i + 1) : (i "," (j + 1))
+    OPTIND = i + 1
+  } else if (OPT != ":" && index(optstring, OPT)) {
+    OPTIND = (OPTARG == "") ? (i + 1) : (i "," (j + 1))
   } else {
-    OPTARG = "illegal option -- " opt
-    opt = "?"
+    OPTERR = "illegal option -- " OPT
+    OPTARG = "?"
+    return
   }
-  return opt
+  return 1
 }
 
 function prinit(str) {
@@ -69,16 +67,16 @@ BEGIN {
   }
 
   OPTIND = i
-  while(OPT = getopts("pnvs0", ARGV)) {
+  while(getopts("pnvs0", ARGV)) {
     if (OPT == "p") prefix = "export "
     if (OPT == "n") mode = "name"
     if (OPT == "v") mode = "value"
     if (OPT == "0") newline = NUL
     if (OPT == "s") silent = 1
-    if (OPT == "?") abort("export: " OPTARG)
   }
-  i = OPTIND
+  if (OPTERR) abort("exprot: " OPTERR)
 
+  i = OPTIND
   if (i < ARGC) {
     envkeys_length = 0
     for (; i < ARGC; i++) {
